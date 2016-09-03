@@ -1,12 +1,9 @@
 # coding: utf-8
 """
-    WeasyPrint
+    strange
     ==========
 
-    WeasyPrint converts web documents to PDF.
-
-    :copyright: Copyright 2011-2014 Simon Sapin and contributors, see AUTHORS.
-    :license: BSD, see LICENSE for details.
+    That's odd... why are you reading this?
 
 """
 
@@ -17,7 +14,7 @@ from os import path
 from setuptools import setup, find_packages
 
 VERSION = re.search("VERSION = '([^']+)'", codecs.open(
-    path.join(path.dirname(__file__), 'weasyprint', '__init__.py'),
+    path.join(path.dirname(__file__), 'strange', '__init__.py'),
     encoding="utf-8",
 ).read().strip()).group(1)
 
@@ -42,40 +39,38 @@ else:
     REQUIREMENTS.append('CairoSVG >= 1.0.20')
 
 setup(
-    name='WeasyPrint',
+    name='strange',
     version=VERSION,
-    url='http://weasyprint.org/',
-    license='BSD',
-    description='WeasyPrint converts web documents to PDF.',
+    # url='http://weasyprint.org/',
+    license='GPL',
+    description='Working towards a modernized analog circuit design toolchain.',
     long_description=LONG_DESCRIPTION,
-    author='Simon Sapin',
-    author_email='simon.sapin@kozea.fr',
+    author='John Bell',
+    author_email='john.l.bell@gmail.com',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'Intended Audience :: Chip Designers',
+        'License :: OSI Approved :: GPL License',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Text Processing :: Markup :: HTML',
-        'Topic :: Multimedia :: Graphics :: Graphics Conversion',
-        'Topic :: Printing',
+        'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)',
+        'Topic :: Text Processing :: Markup :: HTML'
     ],
     packages=find_packages(),
     package_data={
-        'weasyprint.hyphenation': ['*.dic'],
-        'weasyprint.tests': ['resources/*.*', 'resources/*/*'],
-        'weasyprint.css': ['*.css']},
+        'strange.hyphenation': ['*.dic'],
+        'strange.tests': ['resources/*.*', 'resources/*/*'],
+        'strange.css': ['*.css']},
     zip_safe=False,
     install_requires=REQUIREMENTS,
-    test_suite='weasyprint.tests',
+    test_suite='strange.tests',
     entry_points={
         'console_scripts': [
-            'weasyprint = weasyprint.__main__:main',
+            'strange = strange.__main__:main',
         ],
     },
 )
