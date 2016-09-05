@@ -15,9 +15,9 @@ from __future__ import division
 
 import os.path
 
-from weasyprint import HTML, CSS
-from weasyprint.urls import url_is_absolute
-from weasyprint.compat import parse_qs, base64_encode, iteritems
+from strange import HTML, CSS
+from strange.urls import url_is_absolute
+from strange.compat import parse_qs, base64_encode, iteritems
 
 
 FAVICON = os.path.join(os.path.dirname(__file__),

@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-    weasyprint.__main__
+    strange.__main__
     -------------------
 
     Command-line interface to WeasyPrint.
@@ -80,10 +80,10 @@ def main(argv=None, stdout=None, stdin=None):
 
     """
     parser = argparse.ArgumentParser(
-        prog='weasyprint', description='Renders web pages to PDF or PNG.')
+        prog='strange', description='Renders web pages to PDF or PNG.')
     parser.add_argument('--version', action='version',
-                        version='WeasyPrint version %s' % VERSION,
-                        help="Print WeasyPrint's version number and exit.")
+                        version='strange version %s' % VERSION,
+                        help="Print strange's version number and exit.")
     parser.add_argument('-e', '--encoding',
                         help='Character encoding of the input')
     parser.add_argument('-f', '--format', choices=['pdf', 'png'],

@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-    weasyprint.tests.testing_utils
+    strange.tests.testing_utils
     ------------------------------
 
     Helpers for tests.

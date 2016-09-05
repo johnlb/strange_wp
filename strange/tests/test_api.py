@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-    weasyprint.tests.test_api
+    strange.tests.test_api
     -------------------------
 
     Test the public API.

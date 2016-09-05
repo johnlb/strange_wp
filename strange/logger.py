@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-    weasyprint.logging
+    strange.logging
     ------------------
 
     Logging setup.
@@ -18,7 +18,7 @@ from __future__ import division, unicode_literals
 import logging
 
 
-LOGGER = logging.getLogger('weasyprint')
+LOGGER = logging.getLogger('strange')
 
 # Default to logging to stderr.
 if not LOGGER.handlers:

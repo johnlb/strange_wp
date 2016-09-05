@@ -1,15 +1,18 @@
 # coding: utf-8
 """
-    WeasyPrint
+    strange
     ==========
 
-    WeasyPrint converts web documents to PDF.
+    Working towards a modernized analog circuit design toolchain.
 
-    The public API is what is accessible from this "root" packages
-    without importing sub-modules.
+    This is an alpha development; the features will be pretty
+    fluid as we start to look for the best solutions to design
+    problems. A stable version will be released in a new repo
+    with the release name ("strange" is just a project codename).
 
-    :copyright: Copyright 2011-2014 Simon Sapin and contributors, see AUTHORS.
-    :license: BSD, see LICENSE for details.
+    This project has been forked from WeasyPrint (thanks y'all
+    for the great codebase to start from), but is fundamentally
+    different in its intentions.
 
 """
 
@@ -19,11 +22,11 @@ import contextlib  # noqa
 import html5lib  # noqa
 
 
-VERSION = '0.31'
+VERSION = '0.0'
 __version__ = VERSION
 
 # Used for 'User-Agent' in HTTP and 'Creator' in PDF
-VERSION_STRING = 'WeasyPrint %s (http://weasyprint.org/)' % VERSION
+VERSION_STRING = 'strange %s ' % VERSION
 
 __all__ = ['HTML', 'CSS', 'Attachment', 'Document', 'Page',
            'default_url_fetcher', 'VERSION']

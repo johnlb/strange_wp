@@ -15,5 +15,5 @@ install:
   - wget "https://github.com/Kozea/Ahem/blob/master/Ahem.ttf?raw=true" -O ~/.fonts/Ahem.ttf
 script:
   - py.test -s
-  - flake8 weasyprint
+  - flake8 strange
 sudo: false

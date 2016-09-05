@@ -1,5 +1,5 @@
-recursive-include weasyprint/tests/resources *
-include weasyprint/css/*.css
+recursive-include strange/tests/resources *
+include strange/css/*.css
 include CHANGES
 include LICENSE
 include pytest.ini
