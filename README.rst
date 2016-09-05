@@ -1,10 +1,6 @@
 strange
 =======
 
-.. image:: http://img.shields.io/travis/Kozea/WeasyPrint.svg?style=flat-square
-    :target: http://travis-ci.org/Kozea/WeasyPrint
-    :alt: Build status
-
 .. image:: https://travis-ci.org/johnlb/strange_wp.svg?branch=master
     :target: https://travis-ci.org/johnlb/strange_wp
 
