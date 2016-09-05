@@ -108,7 +108,7 @@ def test_html_parsing():
         if has_base_url:
             url = urljoin(html.base_url, 'pattern.png')
             assert url.startswith('file:')
-            assert url.endswith('weasyprint/tests/resources/pattern.png')
+            assert url.endswith('strange/tests/resources/pattern.png')
         else:
             assert html.base_url is None
 
@@ -146,7 +146,7 @@ def test_css_parsing():
         assert url_value.type == 'URI'
         url = urljoin(css.base_url, url_value.value)
         assert url.startswith('file:')
-        assert url.endswith('weasyprint/tests/resources/pattern.png')
+        assert url.endswith('strange/tests/resources/pattern.png')
 
     _test_resource(CSS, 'utf8-test.css', check_css)
     _test_resource(CSS, 'latin1-test.css', check_css, encoding='latin1')
