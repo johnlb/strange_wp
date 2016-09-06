@@ -11,8 +11,7 @@
     with the release name ("strange" is just a project codename).
 
     This project has been forked from WeasyPrint (thanks y'all
-    for the great codebase to start from), but is fundamentally
-    different in its intentions.
+    for the great codebase to start from).
 
 """
 
@@ -179,6 +178,42 @@ class HTML(object):
 
         """
         return self.render(stylesheets, presentational_hints).write_pdf(
+            target, zoom, attachments)
+
+    def write_gds(self, target=None, stylesheets=None, zoom=1,
+                  attachments=None, presentational_hints=False):
+        """Render the document to a GDS file.
+
+        This is a shortcut for calling :meth:`render`, then
+        :meth:`Document.write_gds() <document.Document.write_gds>`.
+
+        :param target:
+            A filename, file-like object, or :obj:`None`.
+        :param stylesheets:
+            An optional list of user stylesheets. (See
+            :ref:`stylesheet-origins`\.) The list’s elements are
+            :class:`CSS` objects, filenames, URLs, or file-like objects.
+        :type zoom: float
+        :param zoom:
+            This is ignored, for now. Not sure if I'll implement it. Here is
+            description from original write_pdf():
+
+            The zoom factor in PDF units per CSS units.
+            **Warning**: All CSS units (even physical, like ``cm``)
+            are affected.
+            For values other than 1, physical CSS units will thus be “wrong”.
+            Page size declarations are affected too, even with keyword values
+            like ``@page { size: A3 landscape; }``
+        :param attachments: A list of additional file attachments for the
+            generated GDS document or :obj:`None`. The list's elements are
+            :class:`Attachment` objects, filenames, URLs or file-like objects.
+        :type presentational_hints: bool
+        :param presentational_hints: Whether HTML presentational hints are
+            followed.
+        :returns:
+            GDS library as gdspy.Cell instance.
+        """
+        return self.render(stylesheets, presentational_hints).write_gds(
             target, zoom, attachments)
 
     def write_image_surface(self, stylesheets=None, resolution=96,

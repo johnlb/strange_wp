@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-    weasyprint.draw
+    strange.draw
     ---------------
 
     Take an "after layout" box tree and draw it onto a cairo context.
@@ -100,6 +100,18 @@ def draw_page(page, context, enable_hinting):
         context, page.canvas_background, enable_hinting, clip_box=False)
     draw_border(context, page, enable_hinting)
     draw_stacking_context(context, stacking_context, enable_hinting)
+
+
+def draw_page_gds(page, cell, enable_hinting):
+    """Draw the given PageBox."""
+    stacking_context = StackingContext.from_page(page)
+    # draw_background(
+    #     context, stacking_context.box.background, enable_hinting,
+    #     clip_box=False)
+    # draw_background(
+    #     context, page.canvas_background, enable_hinting, clip_box=False)
+    # draw_border(context, page, enable_hinting)
+    draw_stacking_context_gds(cell, stacking_context, enable_hinting)
 
 
 def draw_box_background_and_border(context, page, box, enable_hinting):
@@ -219,6 +231,110 @@ def draw_stacking_context(context, stacking_context, enable_hinting):
         if box.style.opacity < 1:
             context.pop_group_to_source()
             context.paint_with_alpha(box.style.opacity)
+
+
+def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
+    """Draw a ``stacking_context`` on ``cell``."""
+    # See http://www.w3.org/TR/CSS2/zindex.html
+
+    # I think the two with statements are just a way to temp. work with clip()
+    # TODO: check this
+
+    # TODO: add clipping?
+    # box = stacking_context.box
+    # if box.is_absolutely_positioned() and box.style.clip:
+    #     top, right, bottom, left = box.style.clip
+    #     if top == 'auto':
+    #         top = 0
+    #     if right == 'auto':
+    #         right = 0
+    #     if bottom == 'auto':
+    #         bottom = box.border_height()
+    #     if left == 'auto':
+    #         left = box.border_width()
+    #     context.rectangle(
+    #         box.border_box_x() + right,
+    #         box.border_box_y() + top,
+    #         left - right,
+    #         bottom - top)
+    #     context.clip()
+
+
+    # We shouldn't be doing any transformations...
+    # if box.transformation_matrix:
+    #     try:
+    #         box.transformation_matrix.copy().invert()
+    #     except cairo.cairoerror:
+    #         return
+    #     else:
+    #         context.transform(box.transformation_matrix)
+
+
+# TO DO: implement all these drawing subfunctions
+
+    # point 1 is done in draw_page
+
+    # point 2
+    if isinstance(box, (boxes.blockbox, boxes.marginbox,
+                        boxes.inlineblockbox, boxes.tablecellbox)):
+        # the canvas background was removed by set_canvas_background
+        draw_box_background_and_border_gds(
+            cell, stacking_context.page, box, enable_hinting)
+
+    # No rounded box borders (for now?) or clipping...
+    # if box.style.overflow != 'visible':
+    #     # only clip the content and the children:
+    #     # - the background is already clipped
+    #     # - the border must *not* be clipped
+    #     rounded_box_path_gds(cell, box.rounded_padding_box())
+    #     context.clip()
+
+    # point 3
+    for child_context in stacking_context.negative_z_contexts:
+        draw_stacking_context_gds(cell, child_context, enable_hinting)
+
+    # point 4
+    for block in stacking_context.block_level_boxes:
+        draw_box_background_and_border_gds(
+            cell, stacking_context.page, block, enable_hinting)
+
+    # point 5
+    for child_context in stacking_context.float_contexts:
+        draw_stacking_context_gds(cell, child_context, enable_hinting)
+
+    # point 6
+    if isinstance(box, boxes.inlinebox):
+        draw_inline_level_gds(
+            cell, stacking_context.page, box, enable_hinting)
+
+    # point 7
+    for block in [box] + stacking_context.blocks_and_cells:
+        marker_box = getattr(block, 'outside_list_marker', none)
+        if marker_box:
+            draw_inline_level_gds(
+                cell, stacking_context.page, marker_box,
+                enable_hinting)
+
+        if isinstance(block, boxes.replacedbox):
+            draw_replacedbox(cell, block)
+        else:
+            for child in block.children:
+                if isinstance(child, boxes.linebox):
+                    # todo: draw inline tables
+                    draw_inline_level_gds(
+                        cell, stacking_context.page, child,
+                        enable_hinting)
+
+    # point 8
+    for child_context in stacking_context.zero_z_contexts:
+        draw_stacking_context_gds(cell, child_context, enable_hinting)
+
+    # point 9
+    for child_context in stacking_context.positive_z_contexts:
+        draw_stacking_context_gds(cell, child_context, enable_hinting)
+
+    # point 10
+    draw_outlines_gds(cell, box, enable_hinting)
 
 
 def rounded_box_path(context, radii):

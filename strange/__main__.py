@@ -86,9 +86,9 @@ def main(argv=None, stdout=None, stdin=None):
                         help="Print strange's version number and exit.")
     parser.add_argument('-e', '--encoding',
                         help='Character encoding of the input')
-    parser.add_argument('-f', '--format', choices=['pdf', 'png'],
+    parser.add_argument('-f', '--format', choices=['pdf', 'png', 'gds'],
                         help='Output format. Can be ommited if `output` '
-                             'ends with a .pdf or .png extension.')
+                             'ends with a .pdf, .png or .gds extension.')
     parser.add_argument('-s', '--stylesheet', action='append',
                         help='URL or filename for a user CSS stylesheet. '
                              'May be given multiple times.')
@@ -119,10 +119,12 @@ def main(argv=None, stdout=None, stdin=None):
             format_ = 'pdf'
         elif output_lower.endswith('.png'):
             format_ = 'png'
+        elif output_lower.endswith('.gds'):
+            format_ = 'gds'
         else:
             parser.error(
                 'Either sepecify a format with -f or choose an '
-                'output filename that ends in .pdf or .png')
+                'output filename that ends in .pdf, .png or .gds')
     else:
         format_ = args.format.lower()
 
