@@ -16,6 +16,7 @@ import shutil
 import functools
 
 import cairocffi as cairo
+import gdspy
 
 from . import CSS
 from . import images

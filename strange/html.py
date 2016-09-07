@@ -11,6 +11,8 @@
     have intrinsic dimensions. But the only replaced elements currently
     supported in WeasyPrint are images with intrinsic dimensions.
 
+    Adding support for gdspy geometery objects to be used as content.
+
     :copyright: Copyright 2011-2014 Simon Sapin and contributors, see AUTHORS.
     :license: BSD, see LICENSE for details.
 
@@ -28,6 +30,11 @@ from .urls import get_url_attribute
 from .compat import xrange, urljoin
 from .logger import LOGGER
 from . import CSS
+
+import gdspy
+import .core as lib
+from .containers import geometryContainer
+
 
 
 # XXX temporarily disable logging for user-agent stylesheet
@@ -192,6 +199,23 @@ def handle_object(element, box, get_image_from_uri):
     return [box]
 
 
+# TO DO: dynamically add handlers
+# TO DO: add externally-referencable libraries
+@handler('fet')
+def handle_fet(element, box, _get_image_from_uri):
+    """Handle ``fet`` elements, return a geometryContainer with the content.
+
+    Treated similar to ``object`` element.
+    """
+    # if 'fet' in lib:
+    try:
+        build_fn = lib.core.fet
+        return [make_replaced_box(element, box, build_fn)]
+    except AttributeError:
+        # The element’s children are the fallback.
+        return [box]
+
+
 def integer_attribute(element, box, name, minimum=1):
     """Read an integer attribute from the HTML element and set it on the box.
 
@@ -219,6 +243,8 @@ def handle_colgroup(element, box, _get_image_from_uri):
                 boxes.TableColumnBox.anonymous_from(box, [])
                 for _i in xrange(box.span))
     return [box]
+
+
 
 
 @handler('col')
