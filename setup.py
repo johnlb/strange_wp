@@ -29,7 +29,8 @@ REQUIREMENTS = [
     'cssselect>=0.6',
     'cffi>=0.6',
     'cairocffi>=0.5',
-    'Pyphen>=0.8'
+    'Pyphen>=0.8',
+    'gdspy'
     # C dependencies: Gdk-Pixbuf (optional), Pango, cairo.
 ]
 

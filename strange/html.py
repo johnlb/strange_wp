@@ -32,7 +32,7 @@ from .logger import LOGGER
 from . import CSS
 
 import gdspy
-import .core as lib
+from .core import core
 from .containers import geometryContainer
 
 
@@ -209,7 +209,7 @@ def handle_fet(element, box, _get_image_from_uri):
     """
     # if 'fet' in lib:
     try:
-        build_fn = lib.core.fet
+        build_fn = core.fet
         return [make_replaced_box(element, box, build_fn)]
     except AttributeError:
         # The element’s children are the fallback.

@@ -138,6 +138,7 @@ def draw_box_background_and_border_gds(cell, page, box, enable_hinting):
     # draw_background_gds(cell, box.background, enable_hinting)
     if isinstance(box, boxes.TableBox):
         ## No tables in layout!
+        pass
         # draw_table_backgrounds(cell, page, box, enable_hinting)
         # if box.style.border_collapse == 'separate':
         #     draw_border_gds(cell, box, enable_hinting)
@@ -261,8 +262,8 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
     # I think the two with statements are just a way to temp. work with clip()
     # TODO: check this
 
+    box = stacking_context.box
     # TODO: add clipping?
-    # box = stacking_context.box
     # if box.is_absolutely_positioned() and box.style.clip:
     #     top, right, bottom, left = box.style.clip
     #     if top == 'auto':
@@ -291,13 +292,11 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
     #         context.transform(box.transformation_matrix)
 
 
-# TO DO: implement all these drawing subfunctions
-
     # point 1 is done in draw_page
 
     # point 2
-    if isinstance(box, (boxes.blockbox, boxes.marginbox,
-                        boxes.inlineblockbox, boxes.tablecellbox)):
+    if isinstance(box, (boxes.BlockBox, boxes.MarginBox,
+                        boxes.InlineBlockBox, boxes.TableCellBox)):
         # the canvas background was removed by set_canvas_background
         draw_box_background_and_border_gds(
             cell, stacking_context.page, box, enable_hinting)
@@ -324,23 +323,23 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
         draw_stacking_context_gds(cell, child_context, enable_hinting)
 
     # point 6
-    if isinstance(box, boxes.inlinebox):
+    if isinstance(box, boxes.InlineBox):
         draw_inline_level_gds(
             cell, stacking_context.page, box, enable_hinting)
 
     # point 7
     for block in [box] + stacking_context.blocks_and_cells:
-        marker_box = getattr(block, 'outside_list_marker', none)
+        marker_box = getattr(block, 'outside_list_marker', None)
         if marker_box:
             draw_inline_level_gds(
                 cell, stacking_context.page, marker_box,
                 enable_hinting)
 
-        if isinstance(block, boxes.replacedbox):
+        if isinstance(block, boxes.ReplacedBox):
             draw_replacedbox(cell, block)
         else:
             for child in block.children:
-                if isinstance(child, boxes.linebox):
+                if isinstance(child, boxes.LineBox):
                     # todo: draw inline tables
                     draw_inline_level_gds(
                         cell, stacking_context.page, child,
@@ -599,7 +598,7 @@ def draw_border(context, box, enable_hinting):
     draw_column_border()
 
 
-def draw_border_gds(context, box, enable_hinting):
+def draw_border_gds(cell, box, enable_hinting):
     """Draw the box border to a ``gdspy.Cell``."""
     # We need a plan to draw beautiful borders, and that's difficult, no need
     # to lie. Let's try to find the cases that we can handle in a smart way.
@@ -893,9 +892,8 @@ def draw_rounded_border(context, box, style, color):
     context.fill()
 
 
-def draw_rounded_border_gds(cell, box, style, layer):
-    bbx, bby, bbw, bbh = box
-    cell.add( gdspy.Rectangle((bbx, bby), (bbx+bbw, bby+bbh), layer) )
+def draw_rounded_border_gds(cell, box, style, color):
+    draw_rect_border_gds(cell, box, [], style, color)
 
     # TO DO: add rounded border feature?
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
@@ -918,8 +916,46 @@ def draw_rounded_border_gds(cell, box, style, layer):
 
 
 def draw_rect_border(context, box, widths, style, color):
+    context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
     bbx, bby, bbw, bbh = box
-    cell.add( gdspy.Rectangle((bbx, bby), (bbx+bbw, bby+bbh), layer) )
+    bt, br, bb, bl = widths
+    context.rectangle(*box)
+    if style in ('ridge', 'groove'):
+        context.rectangle(
+            bbx + bl / 2, bby + bt / 2,
+            bbw - (bl + br) / 2, bbh - (bt + bb) / 2)
+        context.set_source_rgba(*color[0])
+        context.fill()
+        context.rectangle(
+            bbx + bl / 2, bby + bt / 2,
+            bbw - (bl + br) / 2, bbh - (bt + bb) / 2)
+        context.rectangle(
+            bbx + bl, bby + bt, bbw - bl - br, bbh - bt - bb)
+        context.set_source_rgba(*color[1])
+        context.fill()
+        return
+    if style == 'double':
+        context.rectangle(
+            bbx + bl / 3, bby + bt / 3,
+            bbw - (bl + br) / 3, bbh - (bt + bb) / 3)
+        context.rectangle(
+            bbx + bl * 2 / 3, bby + bt * 2 / 3,
+            bbw - (bl + br) * 2 / 3, bbh - (bt + bb) * 2 / 3)
+    context.rectangle(bbx + bl, bby + bt, bbw - bl - br, bbh - bt - bb)
+    context.set_source_rgba(*color)
+    context.fill()
+
+
+def draw_rect_border_gds(cell, box, widths, style, color):
+    bbx, bby, bbw, bbh, *_ = box.rounded_padding_box()
+    # TO DO: find a good way to manage precision
+    PRECISION = 5e-9
+    bbx *= PRECISION
+    bby *= PRECISION
+    bbw *= PRECISION
+    bbh *= PRECISION
+    cell.add( gdspy.Rectangle((bbx, bby),
+                                (bbx+bbw, bby+bbh), int(color.red)) )
 
     # TO DO: add more interesting border style features.
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
@@ -972,6 +1008,28 @@ def draw_outlines(context, box, enable_hinting):
         for child in box.children:
             if isinstance(child, boxes.Box):
                 draw_outlines(context, child, enable_hinting)
+
+
+def draw_outlines_gds(cell, box, enable_hinting):
+    width = box.style.outline_width
+    # TO DO: make this 'layer'
+    color = box.style.get_color('outline_color')
+    style = box.style.outline_style
+    if box.style.visibility == 'visible' and width != 0:
+        outline_box = (
+            box.border_box_x() - width, box.border_box_y() - width,
+            box.border_width() + 2 * width, box.border_height() + 2 * width)
+        for side in SIDES:
+            # clip_border_segment(
+            #     context, enable_hinting, style, width, side, outline_box)
+            draw_rect_border_gds(
+                context, outline_box, 4 * (width,), style,
+                styled_color(style, color, side))
+
+    if isinstance(box, boxes.ParentBox):
+        for child in box.children:
+            if isinstance(child, boxes.Box):
+                draw_outlines_gds(cell, child, enable_hinting)
 
 
 def draw_collapsed_borders(context, table, enable_hinting):
@@ -1156,6 +1214,7 @@ def draw_inline_level_gds(cell, page, box, enable_hinting):
             for child in box.children:
                 if isinstance(child, boxes.TextBox):
                     # TO DO: add text labels
+                    pass
                     # draw_text(context, child, enable_hinting)
                 else:
                     draw_inline_level_gds(context, page, child, enable_hinting)

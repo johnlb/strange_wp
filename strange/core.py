@@ -8,7 +8,7 @@ import gdspy
 import math
 
 from . import stdStackup
-from containers import geometryContainer
+from .containers import geometryContainer
 
 # def contactHelper( bbH, bbW, COsize=0.04, COspace=0.03, COoffsetY=0, COoffsetX=0 ) :
 # 	"""
