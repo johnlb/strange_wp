@@ -262,24 +262,25 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
     # I think the two with statements are just a way to temp. work with clip()
     # TODO: check this
 
+    
+    # TODO: clipping?
     box = stacking_context.box
-    # TODO: add clipping?
-    # if box.is_absolutely_positioned() and box.style.clip:
-    #     top, right, bottom, left = box.style.clip
-    #     if top == 'auto':
-    #         top = 0
-    #     if right == 'auto':
-    #         right = 0
-    #     if bottom == 'auto':
-    #         bottom = box.border_height()
-    #     if left == 'auto':
-    #         left = box.border_width()
-    #     context.rectangle(
-    #         box.border_box_x() + right,
-    #         box.border_box_y() + top,
-    #         left - right,
-    #         bottom - top)
-    #     context.clip()
+    if box.is_absolutely_positioned() and box.style.clip:
+        top, right, bottom, left = box.style.clip
+        if top == 'auto':
+            top = 0
+        if right == 'auto':
+            right = 0
+        if bottom == 'auto':
+            bottom = box.border_height()
+        if left == 'auto':
+            left = box.border_width()
+        cell.rectangle(
+            box.border_box_x() + right,
+            box.border_box_y() + top,
+            left - right,
+            bottom - top)
+        # cell.clip()
 
 
     # We shouldn't be doing any transformations...
@@ -336,7 +337,7 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
                 enable_hinting)
 
         if isinstance(block, boxes.ReplacedBox):
-            draw_replacedbox(cell, block)
+            draw_replacedbox_gds(cell, block)
         else:
             for child in block.children:
                 if isinstance(child, boxes.LineBox):
@@ -893,7 +894,8 @@ def draw_rounded_border(context, box, style, color):
 
 
 def draw_rounded_border_gds(cell, box, style, color):
-    draw_rect_border_gds(cell, box, [], style, color)
+    x,y,w,h, *_ = box.rounded_border_box()
+    draw_rect_border_gds(cell, (x,y,w,h), [], style, color)
 
     # TO DO: add rounded border feature?
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
@@ -947,15 +949,21 @@ def draw_rect_border(context, box, widths, style, color):
 
 
 def draw_rect_border_gds(cell, box, widths, style, color):
-    bbx, bby, bbw, bbh, *_ = box.rounded_padding_box()
+    bbx, bby, bbw, bbh = box
+    # bt, br, bb, bl = widths
+    
     # TO DO: find a good way to manage precision
     PRECISION = 5e-9
-    bbx *= PRECISION
-    bby *= PRECISION
-    bbw *= PRECISION
-    bbh *= PRECISION
-    cell.add( gdspy.Rectangle((bbx, bby),
-                                (bbx+bbw, bby+bbh), int(color.red)) )
+    UNITS = 1e-6
+    PPU = UNITS/PRECISION   # Pixels per unit
+  
+    bbx /= PPU
+    bby /= PPU
+    bbw /= PPU
+    bbh /= PPU
+    cell.add(  
+        gdspy.Rectangle((bbx, -bby),
+        (bbx+bbw, -(bby+bbh)), int(color.red*256)) )
 
     # TO DO: add more interesting border style features.
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
@@ -1019,12 +1027,9 @@ def draw_outlines_gds(cell, box, enable_hinting):
         outline_box = (
             box.border_box_x() - width, box.border_box_y() - width,
             box.border_width() + 2 * width, box.border_height() + 2 * width)
-        for side in SIDES:
-            # clip_border_segment(
-            #     context, enable_hinting, style, width, side, outline_box)
-            draw_rect_border_gds(
-                context, outline_box, 4 * (width,), style,
-                styled_color(style, color, side))
+        draw_rect_border_gds(
+            cell, outline_box, 4 * (width,), style,
+            styled_color(style, color, side))
 
     if isinstance(box, boxes.ParentBox):
         for child in box.children:
@@ -1169,13 +1174,14 @@ def draw_replacedbox(context, box):
 
 def draw_replacedbox_gds(cell, box):
     """Draw the given :class:`boxes.ReplacedBox` to a ``gdspy.Cell``."""
-    if box.style.visibility != 'visible' or box.width == 0 or box.height == 0:
-        return
+    # if box.style.visibility != 'visible' or box.width == 0 or box.height == 0:
+    #     return
 
     # rounded_box_path(cell, box.rounded_content_box())
-    cbx = box.content_box_x
-    cby = box.content_box_y
-    box.replacement.draw(cell, (cbx, cby))
+    cbx = box.content_box_x()
+    cby = box.content_box_y()
+    box.replacement.translate_px( [cbx, -cby] )
+    box.replacement.draw(cell)
     # box.replacement.draw(
     #     cell, box.width, box.height, box.style.image_rendering)
 
@@ -1217,9 +1223,9 @@ def draw_inline_level_gds(cell, page, box, enable_hinting):
                     pass
                     # draw_text(context, child, enable_hinting)
                 else:
-                    draw_inline_level_gds(context, page, child, enable_hinting)
+                    draw_inline_level_gds(cell, page, child, enable_hinting)
         elif isinstance(box, boxes.InlineReplacedBox):
-            draw_replacedbox_gds(context, box)
+            draw_replacedbox_gds(cell, box)
         else:
             assert isinstance(box, boxes.TextBox)
             # Should only happen for list markers

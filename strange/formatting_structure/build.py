@@ -172,9 +172,9 @@ def element_to_box(element, style_for, get_image_from_uri, state=None):
         counter_values[name].pop()
         if not counter_values[name]:
             counter_values.pop(name)
-
     box = box.copy_with_children(children)
     replace_content_lists(element, box, style, counter_values)
+
 
     # Specific handling for the element. (eg. replaced element)
     return html.handle_element(element, box, get_image_from_uri)

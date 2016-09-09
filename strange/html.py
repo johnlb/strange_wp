@@ -32,8 +32,9 @@ from .logger import LOGGER
 from . import CSS
 
 import gdspy
-from .core import core
+from .core import Core
 from .containers import geometryContainer
+import tinycss
 
 
 
@@ -199,21 +200,157 @@ def handle_object(element, box, get_image_from_uri):
     return [box]
 
 
+#####################################################
+# GDS Stuff.
+#####################################################
+
+
 # TO DO: dynamically add handlers
 # TO DO: add externally-referencable libraries
 @handler('fet')
-def handle_fet(element, box, _get_image_from_uri):
+def handle_fet(element, box, style):
     """Handle ``fet`` elements, return a geometryContainer with the content.
 
     Treated similar to ``object`` element.
     """
+    elt_attrib = sanitize_attrib(element.attrib) 
+    kwargs = generate_args(elt_attrib, box.style)
     # if 'fet' in lib:
     try:
-        build_fn = core.fet
-        return [make_replaced_box(element, box, build_fn)]
+        geometries = Core.fet(**kwargs)
+        return [make_replaced_box(element, box, geometries)]
     except AttributeError:
         # The element’s children are the fallback.
         return [box]
+
+
+
+def generate_args(attributes, style):
+    args = attributes
+    # TODO: include style
+    # print(dir(style))
+    return args
+
+
+def sanitize_attrib(attributes):
+    """
+    Sanitizes raw attributes dictionary from lxml.
+    
+    - Numeric values are parsed in the same way
+      CSS declarations are parsed.
+
+    Parameters
+    ----------
+    attributes : dictionary
+        Dictionary of attributes, direct from lxml
+
+    Modifies
+    --------
+    attributes
+
+    Returns
+    -------
+    out : dictionary
+        same dictionary, sanitized.
+    """
+    attributes = dict(attributes)
+    for key in attributes.keys():
+        if key in ['id', 'class', 'style']:
+            continue
+        thisToken = tinycss.tokenizer.tokenize_flat(attributes[key])[0]
+        attributes[key] = parse_value(thisToken)
+
+    return attributes
+
+
+
+def parse_value(value):
+    """
+    Converts tinycss Token into appropriate Pythonic value
+
+    Parameters
+    ----------
+    value : tinycss Token
+        value being assigned to a property
+
+    Returns
+    -------
+    out : string | boolean | float (depending on Token's value)
+        Appropriate Pythonic datatype, with unit conversion.
+        Percentages are returned as strings of the form: "90%"
+        (since this function cannot know about the value's default)
+    """
+
+    # TODO: link precision/units to techfile
+    precision = 5e-9
+    units = 1e-6
+    unitsSI = {
+        'Y': 1e24,  # yotta
+        'Z': 1e21,  # zetta
+        'E': 1e18,  # exa
+        'P': 1e15,  # peta
+        'T': 1e12,  # tera
+        'G': 1e9,   # giga
+        'M': 1e6,   # mega
+        'K': 1e3,   # kilo
+        'c': 1e-2,  # centi
+        'm': 1e-3,  # milli
+        'u': 1e-6,  # micro
+        'n': 1e-9,  # nano
+        'p': 1e-12, # pico
+        'f': 1e-15, # femto
+        'a': 1e-18, # atto
+        'z': 1e-21, # zepto
+        'y': 1e-24  # yocto
+    }
+
+
+
+    if value.type == 'DIMENSION':
+        if value.unit == 'px':
+            return value.value * (precision/units)
+        else:
+            return value.value * unitsSI[value.unit[0]]/units
+
+
+
+    elif value.type == 'INTEGER' or value.type == 'NUMBER':
+        return value.value
+
+
+
+    elif value.type == 'PERCENTAGE':
+        return str(value.value) + '%'
+
+
+
+    elif value.type == 'STRING':
+        if value.value.lower() == 'true':
+            return True
+        elif value.value.lower() == 'false':
+            return False
+        else:
+            return value.value
+
+
+
+    elif value.type == 'IDENT':
+        if value.value.lower() == 'true':
+            return True
+        elif value.value.lower() == 'false':
+            return False
+        else:
+            return value.value
+
+
+
+    else:
+        raise Warning("Illegal value (" + str(value.value) + 
+                        ") in css at line " + str(value.line) +
+                        ", column " + str(value.column) )
+
+
+#####################################################
 
 
 def integer_attribute(element, box, name, minimum=1):

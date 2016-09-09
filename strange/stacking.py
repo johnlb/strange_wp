@@ -60,6 +60,7 @@ class StackingContext(object):
         child_contexts = [cls.from_box(child, page) for child in page.children]
         # Children are sub-contexts, remove them from the "normal" tree.
         page = page.copy_with_children([])
+
         return cls(page, child_contexts, [], [], [], page)
 
     @classmethod

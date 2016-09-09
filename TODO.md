@@ -7,6 +7,7 @@ general
 - add pcell library interface (html.py)
 - feature buildout
 - write library system for gdspy
+- why does inline border give wrong size?
 
 
 draw.py
@@ -24,5 +25,12 @@ document.py
 - add hinting based on precision?
 - clipping?
 
+html.py
+=======
+- include style in args
 
-
+containers.py
+=============
+- add automatic extents calculation
+- finish update_extents()
+- add precision mgmt

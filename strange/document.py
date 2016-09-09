@@ -590,7 +590,8 @@ class Document(object):
         for ii, page in enumerate(self.pages):
             this_cell = gdspy.Cell('page ' + str(ii))
             page.paint_gds(this_cell)
-            cells = cells.append(this_cell)
+            cells += [this_cell]
+            # cells = cells.append(this_cell)
 
         # Don't think I need this...
         # write_pdf_metadata(self, file_obj, scale, self.metadata, attachments,

@@ -32,9 +32,10 @@ from .containers import geometryContainer
 # 												stdStackup.CO )]
 
 
-class core():
+class Core():
 
-	def fet(	self, 
+	@classmethod
+	def fet(	cls, 
 				l, w,
 				COsize=0.04, COspace=0.03, COoffsetY=0, COoffsetX=0,
 				COexistsLeft=True, 	COexistsRight=True,
@@ -91,8 +92,9 @@ class core():
 
 		# Build Container
 		geometeries = [gate, active] + contactsLeft + contactsRight
-		extents = (+POextTop, l+rxextright, w+POextBot, -rxextleft)
-		return geometryContainer(geometeries, extents)
+		extents = (+POextTop, l+rxextright, -(w+POextBot), -rxextleft)
+		return geometryContainer(geometeries, extents).translate( \
+														(-extents[3], -extents[0]) )
 
 
 
