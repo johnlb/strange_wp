@@ -1,9 +1,12 @@
+import pdb
+
 import gdspy
 from strange import HTML
 
-
-# HTML('./borders.html').write_gds('-')
-HTML('./fets.html').write_gds('-')
+pdb.set_trace()
+# HTML('./borders.html').write_gds(None)
+HTML("./fets.html").write_gds(None)
+# pdb.run('HTML("./fets.html").write_gds(None)')
 
 # html = HTML('./fets.html')
 # body = html.root_element.getchildren()[1]
@@ -11,4 +14,4 @@ HTML('./fets.html').write_gds('-')
 
 
 
-# gdspy.LayoutViewer()
+gdspy.LayoutViewer()
