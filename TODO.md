@@ -11,16 +11,22 @@ general
 
 features
 ========
-- library support
+- technology support - <tech value=TSMCN45> in head
+- figure out directory search for ref tags (I think WP has this built-in?)
 - add block replacement mechanism (ie pch -> NW + PIMP)
 - add important tags to default stylesheet
 - add css variables to WeasyPrint?
 - Use a tag to include external libraries (ie std cells)
     + <ref src="[path to src]">
 - <!--[if TSMCN45]> ... some HTML here ... <![endif]-->
+    + match with <tech> tag?
 - <script> tag
 - <port layer=M1 name=VIN location=NW??>
     + Need a way to describe location on boundary
+- em notation as "relative to min. property dimension"
+- dummy device / device matching mechanism
+- guard ring generation
+- element rotation (using CSS3 transforms? or via object builders?)
 
 
 draw.py

@@ -10,6 +10,40 @@ Using HTML DOM. This opens us up for some broken-HTML-type drawbacks, but I woul
 - Default char encoding = UTF-8 (don't require encoding tag)
 
 
+## How does technology support work?
+- $TECHPATH defualts to the tech dir in install, but is overridden by env var.
+- Multiple dir search would be nice?
+
+### Dir structure
+- $TECHPATH/
+    + TSMCN45/
+        * TSMCN45.css
+            - defines minimums/defualts
+        * TSMCN45.py
+            - defines layer replacements (pch -> NW+PIMP)
+            - defines layer assignments
+            - defines PRECISION & UNITS
+    + IBM180/
+        * (same as above)
+    + CORE_CMOS/
+        * CORE_CMOS.py
+            - basic device definitions
+            - referenced library, not technology definition itself
+
+### Invocation
+Inside <head>:
+- <tech value="tech_name">
+- "tech_name" matches name of folder in $TECHPATH
+
+### Usage
+- objects in tech_name.py can be imported from anywhere in code via "technology.py" (this is module that handles external import)
+    + html.py uses technology.py to register all the tags tech_name.py needs to register
+    + 
+- tech_name.py can reference other device libraries (ie a "core" device lib) and/or add its own custom devices
+- tech_name.css gets cascaded with current ua.css (maybe via same external stylesheet import in HTML() call? -- need to figure this out)
+
+
+
 ## Styles
 - Inline -- not high priority, but possible
 - <link rel="stylesheet" href="styles_analog.css">
