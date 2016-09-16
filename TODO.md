@@ -9,6 +9,19 @@ general
 - write library system for gdspy
 - why does inline border give wrong size?
 
+features
+========
+- library support
+- add block replacement mechanism (ie pch -> NW + PIMP)
+- add important tags to default stylesheet
+- add css variables to WeasyPrint?
+- Use a tag to include external libraries (ie std cells)
+    + <ref src="[path to src]">
+- <!--[if TSMCN45]> ... some HTML here ... <![endif]-->
+- <script> tag
+- <port layer=M1 name=VIN location=NW??>
+    + Need a way to describe location on boundary
+
 
 draw.py
 =======

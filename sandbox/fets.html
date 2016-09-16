@@ -1,27 +1,29 @@
 <html>
 <head>
-    <style media=print>
-        @page { size:A3 portrait; overflow: visible; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="fets.css">
 </head>
 <body style="font-size: 20px">
-    <!-- pch -->
-    <p style="color:#050000; padding:10px; border:1px solid">
-    <pch style="color:#040000; padding:10px; display:inline; border:1px solid">
-        <fet id=M1 w=1u l=1u class=ana style="visibility:visible; padding:40nm;margin:20nm">
-            <io g=vmirror d=vmirror s=vss b=vss>
-        </fet>
-        <fet id=M1 w=1u l=1u class=ana style="visibility:visible; padding:40nm;margin:20nm">
-            <io g=vmirror d=vmirror s=vss b=vss>
-        </fet>
+    <!-- pch devices -->
+    <pch>
+        <div class=center>
+            <fet id=M1 w=1u l=1u class=ana>
+                <io g=vmirror d=vmirror s=vss b=vss>
+            </fet>
+
+            <fet id=M1 w=1u l=.5u class=ana>
+                <io g=vmirror d=vmirror s=vss b=vss>
+            </fet>
+        </div>
     </pch>
-    </p>
-    <!-- some mt space -->
-    <div style="height:80px; width:100px"></div>
     
-    <!-- nch -->
-    <nch style="color:#030000; border:1px solid; display:block">
-        <fet id=M2 w=1u l=2u class=ana style="visibility:visible; padding:40nm;margin:20nm">
+
+    <!-- some mt space -->
+    <div style="height:980px;"></div>
+    
+
+    <!-- nch devices -->
+    <nch>
+        <fet id=M2 w=1u l=2u class=ana>
             <io g=vmirror d=vmirror s=vss b=vss>
         </fet>
     </nch>

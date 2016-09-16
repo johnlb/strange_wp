@@ -3,7 +3,7 @@ import pdb
 import gdspy
 from strange import HTML
 
-pdb.set_trace()
+# pdb.set_trace()
 # HTML('./borders.html').write_gds(None)
 HTML("./fets.html").write_gds(None)
 # pdb.run('HTML("./fets.html").write_gds(None)')

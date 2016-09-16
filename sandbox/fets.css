@@ -1,0 +1,26 @@
+@page {
+	size: 5um 20um;
+}
+
+pch, nch {
+	padding:10px;
+	display:block;
+	border:1px solid
+}
+
+pch {color:#040000;}
+nch {color:#030000;}
+
+fet {
+	visibility:visible;
+	/*padding:40nm;*/
+	/*margin:20nm;*/
+	/*padding:8px;*/
+	/*margin:4px;*/
+}
+
+
+.center {
+	margin:auto;
+	width: 50%;
+}
