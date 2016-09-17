@@ -31,9 +31,10 @@ from .compat import xrange, urljoin
 from .logger import LOGGER
 from . import CSS
 
+import inspect
 import gdspy
-from .core import Core
-from .containers import geometryContainer
+from techlibs.containers import geometryContainer
+# from .technology import tech
 import tinycss
 
 
@@ -204,31 +205,43 @@ def handle_object(element, box, get_image_from_uri):
 # GDS Stuff.
 #####################################################
 
+def make_fn(fn_to_use):
+    """Return a new version of handle_device using fn_to_use."""
+    def handle_device(element, box, style):
+        """Handle appropriate element, return a geometryContainer with 
+        the content.
 
-# TO DO: dynamically add handlers
-# TO DO: add externally-referencable libraries
-@handler('fet')
-def handle_fet(element, box, style):
-    """Handle ``fet`` elements, return a geometryContainer with the content.
+        Treated similar to ``object`` element.
+        """
+        elt_attrib = sanitize_attrib(element.attrib) 
+        kwargs = generate_args(elt_attrib, box.style)
+        # if 'fet' in lib:
+        try:
+            geometries = fn_to_use(**kwargs)
+            return [make_replaced_box(element, box, geometries)]
+        except AttributeError:
+            # The element’s children are the fallback.
+            return [box]
 
-    Treated similar to ``object`` element.
-    """
-    elt_attrib = sanitize_attrib(element.attrib) 
-    kwargs = generate_args(elt_attrib, box.style)
-    # if 'fet' in lib:
-    try:
-        geometries = Core.fet(**kwargs)
-        return [make_replaced_box(element, box, geometries)]
-    except AttributeError:
-        # The element’s children are the fallback.
-        return [box]
+    return handle_device
 
+
+def register_device_handlers():
+    device_handlers = []
+    for member in inspect.getmembers(tech.Devices):
+        if inspect.ismethod(member[1]):
+            # can't use @decorator for dynamic functions :-/
+            decorator = handler(member[0])
+            device_handlers.append(decorator(make_fn(member[1])))
 
 
 def generate_args(attributes, style):
     args = attributes
     # TODO: include style
-    # print(dir(style))
+    print('--------')
+    print(attributes)
+    # print((style.rxextleft))
+    # print((style.rxextleft))
     return args
 
 
@@ -282,6 +295,8 @@ def parse_value(value):
     """
 
     # TODO: link precision/units to techfile
+    # precision = tech.PRECISION
+    # units = tech.UNITS
     precision = 5e-9
     units = 1e-6
     unitsSI = {

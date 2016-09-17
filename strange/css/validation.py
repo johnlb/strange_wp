@@ -1885,6 +1885,32 @@ def expand_word_wrap(base_url, name, tokens):
     yield 'overflow-wrap', keyword
 
 
+# def validate_non_shorthand(base_url, name, tokens, required=False):
+#     """Default validator for non-shorthand properties."""
+#     if not required and name not in KNOWN_PROPERTIES:
+#         hyphens_name = name.replace('_', '-')
+#         if hyphens_name in KNOWN_PROPERTIES:
+#             raise InvalidValues('did you mean %s?' % hyphens_name)
+#         else:
+#             raise InvalidValues('unknown property')
+
+#     if not required and name not in VALIDATORS:
+#         raise InvalidValues('property not supported yet')
+
+#     keyword = get_single_keyword(tokens)
+#     if keyword in ('initial', 'inherit'):
+#         value = keyword
+#     else:
+#         function = VALIDATORS[name]
+#         if function.wants_base_url:
+#             value = function(tokens, base_url)
+#         else:
+#             value = function(tokens)
+#         if value is None:
+#             raise InvalidValues
+#     return [(name, value)]
+
+
 def validate_non_shorthand(base_url, name, tokens, required=False):
     """Default validator for non-shorthand properties."""
     if not required and name not in KNOWN_PROPERTIES:

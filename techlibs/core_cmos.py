@@ -7,7 +7,7 @@ Process-specific features should be added on top of these devices.
 import gdspy
 import math
 
-from . import stdStackup
+from . import core_stackup
 from .containers import geometryContainer
 
 # def contactHelper( bbH, bbW, COsize=0.04, COspace=0.03, COoffsetY=0, COoffsetX=0 ) :
@@ -29,10 +29,10 @@ from .containers import geometryContainer
 # 		thisY = -COinsetY - ii*(COsize+COspace)	
 # 		contacts = contacts + [gdspy.Rectangle(	(COposX,thisY),
 # 												(COposX+COsize,thisY-COsize),
-# 												stdStackup.CO )]
+# 												core_stackup.CO )]
 
 
-class Core():
+class Devices():
 
 	@classmethod
 	def fet(	cls, 
@@ -66,12 +66,11 @@ class Core():
 		if w<=0:
 			raise Exception("FATAL: Can't have negative width device.")
 
-
 		# Draw gate
-		gate = gdspy.Rectangle((0,POextTop), (l,-(w+POextBot)), stdStackup.PO);
+		gate = gdspy.Rectangle((0,POextTop), (l,-(w+POextBot)), core_stackup.PO);
 
 		# Draw RX
-		active = gdspy.Rectangle((-rxextleft,0), (l+rxextright,-w), stdStackup.RX);
+		active = gdspy.Rectangle((-rxextleft,0), (l+rxextright,-w), core_stackup.RX);
 
 		# Draw CO
 		numCO 		= int( math.floor((w - COspace)/(COspace + COsize)) )
@@ -85,10 +84,10 @@ class Core():
 			
 			contactsLeft = contactsLeft + [gdspy.Rectangle(	(COposXleft,thisY),
 															(COposXleft+COsize,thisY+COsize),
-															stdStackup.CO )]
+															core_stackup.CO )]
 			contactsRight = contactsRight + [gdspy.Rectangle( (COposXright,thisY),
 															 (COposXright+COsize,thisY+COsize),
-															 stdStackup.CO )]
+															 core_stackup.CO )]
 
 		# Build Container
 		geometeries = [gate, active] + contactsLeft + contactsRight
@@ -97,7 +96,7 @@ class Core():
 														(-extents[3], -extents[0]) )
 
 
-
+	@classmethod
 	def res_poly ( self, l, w, POext=0.1, COsize=0.04, COspace=0.03, **kwargs ) :
 		"""
 		Responsible for drawing a fundamental poly resistor.
@@ -116,7 +115,7 @@ class Core():
 		"""
 
 		# Draw PO
-		poly = gdspy.Rectangle((-POext,0), (l+POext,-w), stdStackup.PO);
+		poly = gdspy.Rectangle((-POext,0), (l+POext,-w), core_stackup.PO);
 
 		# Draw CO
 		numCO 		= int( math.floor((w - COspace)/(COspace + COsize)) )
@@ -130,10 +129,10 @@ class Core():
 			
 			contactsLeft = contactsLeft + [gdspy.Rectangle(	(COposXleft,thisY),
 															(COposXleft+COsize,thisY+COsize),
-															stdStackup.CO )]
+															core_stackup.CO )]
 			contactsRight = contactsRight + [gdspy.Rectangle( (COposXright,thisY),
 															 (COposXright+COsize,thisY+COsize),
-															 stdStackup.CO )]
+															 core_stackup.CO )]
 
 		# Build Container
 		geometeries = [poly] + contactsLeft + contactsRight

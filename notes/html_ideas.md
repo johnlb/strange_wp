@@ -17,7 +17,7 @@ Using HTML DOM. This opens us up for some broken-HTML-type drawbacks, but I woul
 ### Dir structure
 - $TECHPATH/
     + TSMCN45/
-        * TSMCN45.css
+        * __init__.css
             - defines minimums/defualts
         * TSMCN45.py
             - defines layer replacements (pch -> NW+PIMP)
@@ -26,7 +26,7 @@ Using HTML DOM. This opens us up for some broken-HTML-type drawbacks, but I woul
     + IBM180/
         * (same as above)
     + CORE_CMOS/
-        * CORE_CMOS.py
+        * __init__.py
             - basic device definitions
             - referenced library, not technology definition itself
 

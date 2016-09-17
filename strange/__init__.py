@@ -20,6 +20,8 @@ from __future__ import division, unicode_literals
 import contextlib  # noqa
 import html5lib  # noqa
 
+from .technology import init_techfile
+
 
 VERSION = '0.0'
 __version__ = VERSION
@@ -213,8 +215,22 @@ class HTML(object):
         :returns:
             GDS library as gdspy.Cell instance.
         """
+        
+        # Initialize techfile first...
+        for elt in self.root_element.iter('tech'):
+            technology.init_techfile(elt.values()[0])
+            break
+        else:
+            raise Exception("Please specify a techfile by placing the <tech> "+
+                "tag inside <head>")
+        self.tech = technology.tech
+        html.tech = technology.tech
+        html.register_device_handlers()
+        
         return self.render(stylesheets, presentational_hints).write_gds(
             target, zoom, attachments)
+
+
 
     def write_image_surface(self, stylesheets=None, resolution=96,
                             presentational_hints=False):
