@@ -23,6 +23,8 @@ import html5lib  # noqa
 from .technology import init_techfile
 
 
+
+
 VERSION = '0.0'
 __version__ = VERSION
 
@@ -224,8 +226,16 @@ class HTML(object):
             raise Exception("Please specify a techfile by placing the <tech> "+
                 "tag inside <head>")
         self.tech = technology.tech
-        html.tech = technology.tech
+        
+
+        # Monkeypatch all the things!
+        html.tech = self.tech
         html.register_device_handlers()
+
+        if not stylesheets:
+            stylesheets = [self.tech.default_stylesheet]
+        else:
+            stylesheets.append(self.tech.default_stylesheet)
         
         return self.render(stylesheets, presentational_hints).write_gds(
             target, zoom, attachments)

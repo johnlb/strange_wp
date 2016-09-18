@@ -8,9 +8,10 @@ general
 
 features
 ========
+- make wp a loaded, monkeypatched module so that we can do the rest of this stuff better.
 - library support
     + fix PRECISION/UNITS refs in computed_values.py, draw.py, containers.py, (any more?)
-    + add call to techlib's css file
+        * Need to monkeypatch to do this. Should probably switch over to monkeypatched version first.
 - figure out how to register all the extra properties needed for Devices
     + add layer property instead of using 'color'
     + list of props from techlib?
@@ -18,7 +19,10 @@ features
 - <script> tag
 - dummy device / device matching mechanism
 - guard ring generation
-- element rotation (using CSS3 transforms? or via object builders?)
+- element rotation
+    + How to input? <fet rot=90> I guess?
+    + L-R flip needed too... <fet flip=lr> or <fet flip=ud> I guess?
+    + CSS3 transform support would be nice, but not primary use case
 - heirarchies
     + Use a tag to include external libraries (ie std cells)
         * <ref src="[path to src]">
