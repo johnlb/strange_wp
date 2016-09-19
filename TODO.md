@@ -9,6 +9,9 @@ general
 features
 ========
 - make wp a loaded, monkeypatched module so that we can do the rest of this stuff better.
+    + fix all the scoping weirdness
+    + figure out how 'containers' works in new system
+    + add precision, units to 'containers'
 - library support
     + fix PRECISION/UNITS refs in computed_values.py, draw.py, containers.py, (any more?)
         * Need to monkeypatch to do this. Should probably switch over to monkeypatched version first.
