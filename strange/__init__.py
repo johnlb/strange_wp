@@ -34,7 +34,7 @@ __version__ = VERSION
 # Used for 'User-Agent' in HTTP and 'Creator' in PDF
 VERSION_STRING = 'strange %s ' % VERSION
 
-__all__ = ['HTML', 'VERSION']
+__all__ = ['HTML', 'VERSION', 'VERSION_STRING']
 
 
 
@@ -43,6 +43,9 @@ __all__ = ['HTML', 'VERSION']
 #
 # So, WeasyPrint isn't built to allow us to inherit+override its methods,
 # so we're accomplishing basically the same thing by monkeypatching.
+#
+# This sucks, but it allows us to keep getting updates from WeasyPrint
+# without having to manually merge hacked files, which would suck more.
 ###############################################################################
 
 wp_patches.patch(wp)

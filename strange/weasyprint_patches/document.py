@@ -7,6 +7,9 @@
 
 """
 
+import gdspy
+draw_page_gds = None # imported by patch()
+
 # Page.paint_gds
 def paint_gds(self, cell, left_x=0, top_y=0, scale=1, clip=False):
     """Paint the page in gdspy.

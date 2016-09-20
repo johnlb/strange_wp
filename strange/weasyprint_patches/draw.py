@@ -7,10 +7,12 @@
 
 """
 
+import gdspy
+
 
 def draw_page_gds(page, cell, enable_hinting):
     """Draw the given PageBox."""
-    stacking_context = StackingContext.from_page(page)
+    stacking_context = scope.StackingContext.from_page(page)
     # draw_background(
     #     context, stacking_context.box.background, enable_hinting,
     #     clip_box=False)
@@ -23,7 +25,7 @@ def draw_page_gds(page, cell, enable_hinting):
 def draw_box_background_and_border_gds(cell, page, box, enable_hinting):
     # Background has no meaning in gds
     # draw_background_gds(cell, box.background, enable_hinting)
-    if isinstance(box, boxes.TableBox):
+    if isinstance(box, scope.boxes.TableBox):
         ## No tables in layout!
         pass
         # draw_table_backgrounds(cell, page, box, enable_hinting)
@@ -43,6 +45,11 @@ def draw_box_background_and_border_gds(cell, page, box, enable_hinting):
 
 def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
     """Draw a ``stacking_context`` on ``cell``."""
+
+    # some things from scope
+    boxes = scope.boxes
+
+
     # See http://www.w3.org/TR/CSS2/zindex.html
 
     # I think the two with statements are just a way to temp. work with clip()
@@ -182,7 +189,7 @@ def draw_border_gds(cell, box, enable_hinting):
         # draw_column_border()
         return
 
-    widths = [getattr(box, 'border_%s_width' % side) for side in SIDES]
+    widths = [getattr(box, 'border_%s_width' % side) for side in scope.SIDES]
 
     # No border, return early.
     if all(width == 0 for width in widths):
@@ -190,10 +197,11 @@ def draw_border_gds(cell, box, enable_hinting):
         return
 
     # TO DO: add "layer" property to box, so I don't have to use "color"
-    colors = [box.style.get_color('border_%s_color' % side) for side in SIDES]
+    colors = [
+        box.style.get_color('border_%s_color' % side) for side in scope.SIDES]
     styles = [
         colors[i].alpha and box.style['border_%s_style' % side]
-        for (i, side) in enumerate(SIDES)]
+        for (i, side) in enumerate(scope.SIDES)]
 
     # The 4 sides are solid or double, and they have the same color. Oh yeah!
     # We can draw them so easily!
@@ -245,6 +253,9 @@ def draw_rounded_border_gds(cell, box, style, color):
 
 
 def draw_rect_border_gds(cell, box, widths, style, color):
+    PPU = scope.PPU
+
+
     bbx, bby, bbw, bbh = box
     # bt, br, bb, bl = widths
     
@@ -290,6 +301,8 @@ def draw_rect_border_gds(cell, box, widths, style, color):
 
 
 def draw_outlines_gds(cell, box, enable_hinting):
+    boxes = scope.boxes
+
     width = box.style.outline_width
     # TO DO: make this 'layer'
     color = box.style.get_color('outline_color')
@@ -325,7 +338,9 @@ def draw_replacedbox_gds(cell, box):
 
 
 def draw_inline_level_gds(cell, page, box, enable_hinting):
-    if isinstance(box, StackingContext):
+    boxes = scope.boxes
+
+    if isinstance(box, scope.StackingContext):
         stacking_context = box
         assert isinstance(stacking_context.box, boxes.InlineBlockBox)
         draw_stacking_context_gds(cell, stacking_context, enable_hinting)

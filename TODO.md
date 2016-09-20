@@ -2,19 +2,11 @@ updated: 9/8/16
 
 general
 =======
-- transfer to separate lib w/ WP as submodule
 - build unit tests
 - feature buildout
 
 features
 ========
-- make wp a loaded, monkeypatched module so that we can do the rest of this stuff better.
-    + fix all the scoping weirdness
-    + figure out how 'containers' works in new system
-    + add precision, units to 'containers'
-- library support
-    + fix PRECISION/UNITS refs in computed_values.py, draw.py, containers.py, (any more?)
-        * Need to monkeypatch to do this. Should probably switch over to monkeypatched version first.
 - figure out how to register all the extra properties needed for Devices
     + add layer property instead of using 'color'
     + list of props from techlib?
@@ -26,6 +18,8 @@ features
     + How to input? <fet rot=90> I guess?
     + L-R flip needed too... <fet flip=lr> or <fet flip=ud> I guess?
     + CSS3 transform support would be nice, but not primary use case
+- finish changeover to monkeypatched architecture
+    + do thorough unit tests to be sure we got all the "scope" additions we need.
 - heirarchies
     + Use a tag to include external libraries (ie std cells)
         * <ref src="[path to src]">
@@ -64,4 +58,3 @@ containers.py
 =============
 - add automatic extents calculation
 - finish update_extents()
-- add precision mgmt

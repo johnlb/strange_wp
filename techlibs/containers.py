@@ -1,9 +1,6 @@
 import numpy as np
 import math
 
-PRECISION = 5e-9
-UNITS = 1e-6
-PPU = UNITS/PRECISION	# Pixels per unit
 
 class geometryContainer():
 	"""
@@ -38,7 +35,10 @@ class geometryContainer():
 	
 	
 
-	def __init__(self, geometries, extents=None):
+	def __init__(self, geometries, extents, tech):
+		self.tech 	= tech
+		self.PPU	= self.tech.units / self.tech.precision
+
 		self._geometries = geometries
 		self._update_extents(geometries)
 
@@ -58,8 +58,8 @@ class geometryContainer():
 
 	def get_intrinsic_size(self, dont, need):
 		"""Returns the width and height of all geometries."""
-		return 	abs((PPU*(self._extent_right - self._extent_left))), \
-				abs((PPU*(self._extent_top - self._extent_bottom)))
+		return 	abs((self.PPU*(self._extent_right - self._extent_left))), \
+				abs((self.PPU*(self._extent_top - self._extent_bottom)))
 
 
 
@@ -108,7 +108,7 @@ class geometryContainer():
 		self : geometryContainer
 		"""
 		delta = np.array(delta,dtype='float')
-		delta /= PPU
+		delta /= self.PPU
 		for geo in self._geometries:
 			geo.translate(delta[0], delta[1])
 

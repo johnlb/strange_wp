@@ -1,3 +1,4 @@
+# coding: utf-8
 """Searches for and imports a specified tech module as 'tech'"""
 
 import imp

@@ -32,10 +32,13 @@ from .containers import geometryContainer
 # 												core_stackup.CO )]
 
 
-class Devices():
+class Devices(object):
 
-	@classmethod
-	def fet(	cls, 
+	def __init__(self, tech):
+		self.tech = tech
+
+
+	def fet(	self,
 				l, w,
 				COsize=0.04, COspace=0.03, COoffsetY=0, COoffsetX=0,
 				COexistsLeft=True, 	COexistsRight=True,
@@ -92,11 +95,10 @@ class Devices():
 		# Build Container
 		geometeries = [gate, active] + contactsLeft + contactsRight
 		extents = (+POextTop, l+rxextright, -(w+POextBot), -rxextleft)
-		return geometryContainer(geometeries, extents).translate( \
-														(-extents[3], -extents[0]) )
+		return geometryContainer(geometeries, extents, self.tech).translate( \
+									(-extents[3], -extents[0]) )
 
 
-	@classmethod
 	def res_poly ( self, l, w, POext=0.1, COsize=0.04, COspace=0.03, **kwargs ) :
 		"""
 		Responsible for drawing a fundamental poly resistor.
@@ -137,4 +139,5 @@ class Devices():
 		# Build Container
 		geometeries = [poly] + contactsLeft + contactsRight
 		extents = (0., l+POext, w, -POext)
-		return geometryContainer(geometeries, extents)
+		return geometryContainer(geometeries, extents, self.tech).translate( \
+									(-extents[3], -extents[0]) )

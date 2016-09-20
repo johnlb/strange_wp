@@ -7,12 +7,15 @@
 
 """
 import inspect
+import gdspy
+import tinycss
 
 tech = None
 
 ###############################################################################
 # This is for __init__.py
 ###############################################################################
+
 def create_hook(wp):
     @staticmethod
     def update_device_handlers(tech_):
@@ -42,7 +45,7 @@ def make_fn(fn_to_use):
         # if 'fet' in lib:
         try:
             geometries = fn_to_use(**kwargs)
-            return [make_replaced_box(element, box, geometries)]
+            return [scope.make_replaced_box(element, box, geometries)]
         except AttributeError:
             # The element’s children are the fallback.
             return [box]
@@ -51,11 +54,14 @@ def make_fn(fn_to_use):
 
 
 def register_device_handlers():
+    scope.device_builder = scope.tech.Devices(scope.tech)
     device_handlers = []
-    for member in inspect.getmembers(tech.Devices):
+    for member in inspect.getmembers(scope.device_builder):
+        if member[0] in ['__init__']:
+            continue
         if inspect.ismethod(member[1]):
             # can't use @decorator for dynamic functions :-/
-            decorator = handler(member[0])
+            decorator = scope.handler(member[0])
             device_handlers.append(decorator(make_fn(member[1])))
 
 
@@ -144,9 +150,9 @@ def parse_value(value):
 
     if value.type == 'DIMENSION':
         if value.unit == 'px':
-            return value.value * (PRECISION/UNITS)
+            return value.value * (scope.tech.precision/scope.tech.units)
         else:
-            return value.value * units_si[value.unit[0]]/UNITS
+            return value.value * units_si[value.unit[0]]/scope.tech.units
 
 
 
