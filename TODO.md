@@ -4,12 +4,18 @@ general
 =======
 - build unit tests
 - feature buildout
+- make example designs
+    + current mirror
+    + Yong's cap array
+    + opamp
+    + DAC
 
 features
 ========
+- why is propery lookup breaking durring cascade?
 - figure out how to register all the extra properties needed for Devices
     + add layer property instead of using 'color'
-    + list of props from techlib?
+    + move validators outside of generic.py -- could auto-assign based on init values?
 - add block replacement mechanism (ie pch -> NW + PIMP)
 - <script> tag
 - dummy device / device matching mechanism
@@ -58,3 +64,12 @@ containers.py
 =============
 - add automatic extents calculation
 - finish update_extents()
+
+core_cmos.py
+============
+- can we make parameters dict auto-populate?
+- maybe we should make it inherit from a base class?
+
+validation.py
+=============
+- support different types of tokens?

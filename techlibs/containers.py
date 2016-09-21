@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 
-class geometryContainer():
+class GeometryContainer():
 	"""
 	Holds a set of geometries and provides basic manipulations.
 

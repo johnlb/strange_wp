@@ -34,7 +34,7 @@ def create_hook(wp):
 
 def make_fn(fn_to_use):
     """Return a new version of handle_device using fn_to_use."""
-    def handle_device(element, box, style):
+    def handle_device(element, box, get_image_from_uri):
         """Handle appropriate element, return a geometryContainer with 
         the content.
 
@@ -67,12 +67,16 @@ def register_device_handlers():
 
 def generate_args(attributes, style):
     args = attributes
-    # TODO: include style
-    print('--------')
-    print(attributes)
-    # print((style.rxextleft))
-    # print((style.rxextleft))
+    args.update( make_style_dict(style) )
     return args
+
+def make_style_dict(style):
+    properties = scope.device_builder.parameters.keys()
+    style_dict = {}
+    for prop in properties:
+        style_dict[prop] = style[prop]
+    return style_dict
+
 
 
 def sanitize_attrib(attributes):

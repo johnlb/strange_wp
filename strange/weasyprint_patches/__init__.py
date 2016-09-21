@@ -13,7 +13,7 @@ import imp
 
 import techlibs.containers as containers
 
-geometryContainer = containers.geometryContainer
+geometryContainer = containers.GeometryContainer
 
 scope   = None
 
@@ -39,8 +39,7 @@ doc         = load_local_module('document')
 html        = load_local_module('html')
 css         = load_local_module('css')
 technology  = load_local_module('technology')
-
-# print(dir(css))
+validation  = load_local_module('validation')
 
 
 
@@ -61,13 +60,14 @@ def patch(wp):
     doc.scope           = wp.document
     html.scope          = wp.html
     css.scope           = wp.css
-    # technology.scope    = wp.technology
+    validation.scope    = wp.css.validation
 
 
     # __init__.py
     wp.technology 					= technology
-    wp.HTML._update_tech_params     = update_tech_params
-    wp.HTML._update_device_handlers = update_device_handlers
+    wp.HTML._update_tech_params     = _update_tech_params
+    wp.HTML._update_device_handlers = _update_device_handlers
+    wp.HTML._update_css_properties  = _update_css_properties
     wp.HTML.write_gds 				= write_gds
 
 
@@ -101,11 +101,6 @@ def patch(wp):
 
     # html.py
     wp_html = wp.html
-
-    # html.inspect                        = load_global_module('inspect')
-    # html.gdspy                          = load_global_module('gdspy')
-    # html.tinycss                        = load_global_module('tinycss')
-    # wp_html.geometryContainer              = geometryContainer
 
     wp_html.make_fn                     = html.make_fn
     wp_html.register_device_handlers    = html.register_device_handlers
@@ -166,6 +161,7 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     # Call hooks that update everything we learned about from the techfile
     self._update_tech_params()
     self._update_device_handlers()
+    self._update_css_properties()
 
 
     if not stylesheets:
@@ -177,7 +173,7 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
         target, zoom, attachments)
 
 
-def update_tech_params(self):
+def _update_tech_params(self):
     # computed_values.LENGTHS_TO_PIXELS
     scope.css.computed_values.LENGTHS_TO_PIXELS = {
         'px': 1,
@@ -209,6 +205,32 @@ def update_tech_params(self):
     scope.css.validation = imp.reload(scope.css.validation)
 
 
-def update_device_handlers(self):
+def _update_device_handlers(self):
     scope.html.tech = self.tech
     scope.html.register_device_handlers()
+
+
+def _update_css_properties(self):
+    prop_scope = scope.css.properties
+    val_scope  = scope.css.validation
+
+
+    # Define appropriate initial values
+    device_builder = scope.html.device_builder
+    prop_scope.INITIAL_VALUES.update(device_builder.parameters)
+
+    # Recalculate this from INITIAL_VALUES
+    prop_scope.KNOWN_PROPERTIES = set(name.replace('_', '-') \
+            for name in prop_scope.INITIAL_VALUES)
+
+    # Update INITIAL_VALUES in computed_values.py
+    scope.css.computed_values.INITIAL_VALUES = prop_scope.INITIAL_VALUES
+
+
+    # Reload 'validation' module to cascade earlier changes.
+    scope.css.validation = imp.reload(scope.css.validation)
+
+
+    # Register properties' methods with validation.py
+    # TODO: add expanders
+    validation.register_validators(device_builder)
