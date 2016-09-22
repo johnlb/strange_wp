@@ -12,10 +12,6 @@ general
 
 features
 ========
-- why is propery lookup breaking durring cascade?
-- figure out how to register all the extra properties needed for Devices
-    + add layer property instead of using 'color'
-    + move validators outside of generic.py -- could auto-assign based on init values?
 - add block replacement mechanism (ie pch -> NW + PIMP)
 - <script> tag
 - dummy device / device matching mechanism
@@ -24,6 +20,10 @@ features
     + How to input? <fet rot=90> I guess?
     + L-R flip needed too... <fet flip=lr> or <fet flip=ud> I guess?
     + CSS3 transform support would be nice, but not primary use case
+- properties
+    + move validators outside of core_cmos.py -- could auto-assign based on init values?
+    + other computers?
+    + add em (as relative to init value) to validators
 - finish changeover to monkeypatched architecture
     + do thorough unit tests to be sure we got all the "scope" additions we need.
 - heirarchies
@@ -32,6 +32,14 @@ features
         * figure out directory search for ref tags (I think WP has this?)
     + <port layer=M1 name=VIN location=NW??>
         * Need a way to describe location on boundary
+
+
+Architecture
+============
+- is there a better way to maintain all the validate and compute functions?
+    + sep. lib?
+- am I doing validation/computing correctly?
+- 
 
 
 wishlist
@@ -45,7 +53,6 @@ wishlist
 
 draw.py
 =======
-- add layer property to box instead of using 'color'
 - add text labels
 - add better border features (ie guard rings)
 - rounded borders?

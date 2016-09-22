@@ -14,4 +14,4 @@ HTML("./fets.html").write_gds(None)
 
 
 
-# gdspy.LayoutViewer()
+gdspy.LayoutViewer()

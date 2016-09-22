@@ -196,7 +196,6 @@ def draw_border_gds(cell, box, enable_hinting):
         # draw_column_border()
         return
 
-    # TO DO: add "layer" property to box, so I don't have to use "color"
     colors = [
         box.style.get_color('border_%s_color' % side) for side in scope.SIDES]
     styles = [
@@ -208,7 +207,7 @@ def draw_border_gds(cell, box, enable_hinting):
     # if set(styles) in (set(('solid',)), set(('double',))) and (
     #         len(set(colors)) == 1):
     if set(styles) in (set(('solid',)), set(('double',))):
-        draw_rounded_border_gds(cell, box, styles[0], colors[0])
+        draw_rounded_border_gds(cell, box, styles[0], box.style['layer'])
         # draw_column_border()
         return
 
@@ -252,7 +251,7 @@ def draw_rounded_border_gds(cell, box, style, color):
     # context.fill()
 
 
-def draw_rect_border_gds(cell, box, widths, style, color):
+def draw_rect_border_gds(cell, box, widths, style, layer):
     PPU = scope.PPU
 
 
@@ -266,7 +265,7 @@ def draw_rect_border_gds(cell, box, widths, style, color):
     bbh /= PPU
     cell.add(  
         gdspy.Rectangle((bbx, -bby),
-        (bbx+bbw, -(bby+bbh)), int(color.red*256)) )
+        (bbx+bbw, -(bby+bbh)), layer) )
 
     # TO DO: add more interesting border style features.
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)

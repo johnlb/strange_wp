@@ -62,27 +62,65 @@ def _validate_number(token):
 
 
 
+def _validate_layer(token):
+    token = token[0]
+    if token.type=="INTEGER":
+        return token.value
+    elif token.type=="STRING" or token.type=="IDENT":
+        try:
+            return getattr(core_stackup, token.value)
+        except:
+            pass
 
-# def contactHelper( bbH, bbW, COsize=0.04, COspace=0.03, COoffsetY=0, COoffsetX=0 ) :
+
+def _compute_distance(computer, name, value):
+    """Compute a property expecting ``distance`` type"""
+    # TODO : add other computations?
+    # if value.unit == '%':
+    #     return value.value * parent_font_size / 100.
+    # else:
+    #     return value.value
+    return value
+
+
+def _compute_bool(computer, name, value):
+    """Compute a property expecting ``boolean`` type"""
+    # TODO: What do I have to do here?
+    return value
+
+
+def _compute_layer(computer, name, value):
+    """Compute the ``layer`` property"""
+    # TODO: What do I have to do here?
+    return value
+
+
+# def contactHelper( bbH, bbW, 
+#                    COsize=0.04, COspace=0.03,
+#                    COoffsetY=0, COoffsetX=0 ) :
 #   """
 #   Draws vertical column of contacts centered within an imaginary box
 #   of height bbH and width bbW.
 
 #   The origin of the result is at the upper left corner of the box.
 
-#   Returns: list of gdspy geometry objects, following the standard layer stackup.
+#   Returns: list of gdspy geometry objects, following the standard 
+#            layer stackup.
 #   """
 
 #   numCO       = math.floor((bbH - COspace)/(COspace + COsize))
-#   COinsetY    = (bbH - COsize - (numCO-1)*(COspace + COsize))/2.0 - COoffsetY;
-#   COposX      = -(rxextleft/2.0 + COsize/2.0 + COoffsetX) # from top left of contact
+#   COinsetY    = (bbH - COsize - (numCO-1)*(COspace + COsize))/2.0 - \
+#                   COoffsetY;
+#   # from top left of contact
+#   COposX      = -(rxextleft/2.0 + COsize/2.0 + COoffsetX)
     
 #   contacts = []
 #   for ii in range(numCO):
 #       thisY = -COinsetY - ii*(COsize+COspace) 
-#       contacts = contacts + [gdspy.Rectangle( (COposX,thisY),
-#                                               (COposX+COsize,thisY-COsize),
-#                                               core_stackup.CO )]
+#       contacts = contacts + [
+#                   gdspy.Rectangle( (COposX,thisY),
+#                                    (COposX+COsize,thisY-COsize),
+#                                    core_stackup.CO )]
 
 
 class Devices(object):
@@ -101,7 +139,10 @@ class Devices(object):
             'ext_right'     : 0.1,
 
             # res_poly
-            'ext'           : 0.1
+            'ext'           : 0.1,
+
+            # misc
+            'layer'         : 0
     }
     validators = {
             # fet
@@ -117,7 +158,29 @@ class Devices(object):
             'ext_right'     : _validate_number,
 
             # res_poly
-            'ext'           : _validate_number
+            'ext'           : _validate_number,
+
+            # misc
+            'layer'         : _validate_layer
+    }
+    computers = {
+            # fet
+            'co_size'       : _compute_distance,
+            'co_space'      : _compute_distance,
+            'co_offsety'    : _compute_distance,
+            'co_offsetx'    : _compute_distance,
+            'co_existsl'    : _compute_bool,
+            'co_existsr'    : _compute_bool,
+            'ext_top'       : _compute_distance,
+            'ext_bot'       : _compute_distance,
+            'ext_left'      : _compute_distance,
+            'ext_right'     : _compute_distance,
+
+            # res_poly
+            'ext'           : _compute_distance,
+
+            # misc
+            'layer'         : _compute_layer
     }
 
 
@@ -144,11 +207,13 @@ class Devices(object):
         active, poly, and contact geometries. Any process-specific
         requirements should be built on top of this geometry.
 
-        Origin of returned geometries will be the top left intersection of the gate
-        and the active area. This ensures geometries stay on-grid after being built.
+        Origin of returned geometries will be the top left intersection 
+        of the gate and the active area. This ensures geometries stay
+        on-grid after being built.
 
-        **kwargs is ignored. It is included to allow for passing of a style dictionary
-        with more entries than those required by this function.
+        **kwargs is ignored. It is included to allow for passing of a 
+        style dictionary with more entries than those required by this
+        function.
 
         Returns: geometryContainer
             A geometryContainer with all gdspy geometries for this device.
@@ -163,7 +228,11 @@ class Devices(object):
         gate = gdspy.Rectangle((0,ext_top), (l,-(w+ext_bot)), core_stackup.PO);
 
         # Draw RX
-        active = gdspy.Rectangle((-ext_left,0), (l+ext_right,-w), core_stackup.RX);
+        active = gdspy.Rectangle(
+                        (-ext_left,0),
+                        (l+ext_right,-w),
+                        core_stackup.RX
+                    );
 
         # Draw CO
         num_co        = int( math.floor((w - co_space)/(co_space + co_size)) )
@@ -192,18 +261,22 @@ class Devices(object):
                                     (-extents[3], -extents[0]) )
 
 
-    def res_poly ( self, l, w, ext=0.1, co_size=0.04, co_space=0.03, **kwargs ) :
+    def res_poly ( self, 
+                   l, w, 
+                   ext=0.1, co_size=0.04, co_space=0.03,
+                   **kwargs ) :
         """
         Responsible for drawing a fundamental poly resistor.
 
-        This function draws poly and contact layers for a poly resistor. The length
-        of the resistor is measured from the inside edges of the contacts.
+        This function draws poly and contact layers for a poly resistor. The 
+        length of the resistor is measured from the inside edges of the
+        contacts.
 
-        Origin of returned geometries will be the top left corner of the resistor
-        boundary (inside edge of left contacts)
+        Origin of returned geometries will be the top left corner of the 
+        resistor boundary (inside edge of left contacts)
 
-        **kwargs is ignored. It is included to allow for passing of a style dictionary
-        with more entries than those required by this function.
+        **kwargs is ignored. It is included to allow for passing of a style
+        dictionary with more entries than those required by this function.
 
         Returns: geometryContainer
             A geometryContainer with all gdspy geometries for this device.

@@ -72,6 +72,7 @@ def generate_args(attributes, style):
 
 def make_style_dict(style):
     properties = scope.device_builder.parameters.keys()
+    style['margin_bottom']
     style_dict = {}
     for prop in properties:
         style_dict[prop] = style[prop]

@@ -40,7 +40,7 @@ html        = load_local_module('html')
 css         = load_local_module('css')
 technology  = load_local_module('technology')
 validation  = load_local_module('validation')
-
+computed_values = load_local_module('computed_values')
 
 
 
@@ -61,6 +61,7 @@ def patch(wp):
     html.scope          = wp.html
     css.scope           = wp.css
     validation.scope    = wp.css.validation
+    computed_values.scope = wp.css.computed_values
 
 
     # __init__.py
@@ -213,6 +214,7 @@ def _update_device_handlers(self):
 def _update_css_properties(self):
     prop_scope = scope.css.properties
     val_scope  = scope.css.validation
+    comp_scope = scope.css.computed_values
 
 
     # Define appropriate initial values
@@ -223,8 +225,11 @@ def _update_css_properties(self):
     prop_scope.KNOWN_PROPERTIES = set(name.replace('_', '-') \
             for name in prop_scope.INITIAL_VALUES)
 
+
+
     # Update INITIAL_VALUES in computed_values.py
-    scope.css.computed_values.INITIAL_VALUES = prop_scope.INITIAL_VALUES
+    comp_scope.INITIAL_VALUES = prop_scope.INITIAL_VALUES
+    comp_scope.COMPUTING_ORDER = comp_scope._computing_order()
 
 
     # Reload 'validation' module to cascade earlier changes.
@@ -234,3 +239,8 @@ def _update_css_properties(self):
     # Register properties' methods with validation.py
     # TODO: add expanders
     validation.register_validators(device_builder)
+
+
+    # Register properties' methods with computed_values.py
+    # TODO: investigate what we can do with this
+    computed_values.register_computers(device_builder)

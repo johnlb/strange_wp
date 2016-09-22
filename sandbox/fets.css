@@ -2,6 +2,12 @@
 	size: 5um 20um;
 }
 
+
+fet {
+	/*Top Poly Extension*/
+	ext-top:0.2;
+}
+
 .center {
 	margin:auto;
 	width: 60%;
