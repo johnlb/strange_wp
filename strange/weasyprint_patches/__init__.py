@@ -1,15 +1,30 @@
 # coding: utf-8
 """Patch WeasyPrint methods to support gds output.
 
-	Provides 1 method:
+	Provides patch() function. Usage:
 	patch(weasyprint_module_instance)
 """
+
+################################################################################
+# Notes on mokeypatching:
+#
+# - I'm sorry.
+# - functions retain the scope they were defined in *after* patching.
+#     Therefore, in every module there is a global "scope" variable
+#     that is soft-patched (inside patch() fn) to the global scope
+#     the function is patched into. That variable is assumed valid
+#     at runtime and can be used to read/modify variables in the new
+#     scope.
+# - Also, I'm sorry.
+################################################################################
 
 
 __all__ = ['patch', 'tech']
 
 
 import imp
+from lxml import etree
+from copy import deepcopy
 
 import techlibs.containers as containers
 
@@ -69,6 +84,7 @@ def patch(wp):
     wp.HTML._update_tech_params     = _update_tech_params
     wp.HTML._update_device_handlers = _update_device_handlers
     wp.HTML._update_css_properties  = _update_css_properties
+    wp.HTML._replace_layer_hook     = _replace_layer_hook
     wp.HTML.write_gds 				= write_gds
 
 
@@ -108,6 +124,8 @@ def patch(wp):
     wp_html.generate_args 				= html.generate_args
     wp_html.sanitize_attrib 			= html.sanitize_attrib
     wp_html.parse_value 				= html.parse_value
+
+
 
 
 
@@ -164,6 +182,7 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     self._update_device_handlers()
     self._update_css_properties()
 
+    self._replace_layer_hook(self.root_element, self.tech.Devices.layer_replace)
 
     if not stylesheets:
         stylesheets = [self.tech.default_stylesheet]
@@ -172,6 +191,10 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     
     return self.render(stylesheets, presentational_hints).write_gds(
         target, zoom, attachments)
+
+
+
+
 
 
 def _update_tech_params(self):
@@ -206,9 +229,15 @@ def _update_tech_params(self):
     scope.css.validation = imp.reload(scope.css.validation)
 
 
+
+
+
 def _update_device_handlers(self):
     scope.html.tech = self.tech
     scope.html.register_device_handlers()
+
+
+
 
 
 def _update_css_properties(self):
@@ -244,3 +273,51 @@ def _update_css_properties(self):
     # Register properties' methods with computed_values.py
     # TODO: investigate what we can do with this
     computed_values.register_computers(device_builder)
+
+
+
+
+def _replace_layer_hook(self, element, replace):
+    """Replace any tags matching keys in "replace" with tags in the
+    corresponding value.
+
+    Values in "replace" are expected to be tuples. Resulting tags are
+    nested in order of tuple, with `replace['key'](0)` as the parent.
+
+    Each new child tag is a copy of the original (with any style, etc.),
+    but with layer set to the corresponding Value in "replace"
+    """
+    def copy_without_children(element):
+        new_elt = deepcopy(element)
+        for e in new_elt.getchildren():
+            new_elt.remove(e)
+        return new_elt
+
+    # Replace any child tags first.
+    for e in element.getchildren():
+        self._replace_layer_hook(e, replace)
+
+    # Replace current tag, if necessary
+    if element.tag in replace:
+        blank_elt = copy_without_children(element)
+        
+        new_elt  = deepcopy(blank_elt)
+        new_root = new_elt
+        parent   = None
+        for layer in replace[element.tag]:
+            try:
+                orig_style = new_elt.attrib['style']
+            except KeyError:
+                orig_style = ''
+            new_elt.attrib['style'] = 'layer:' + layer + ';' + orig_style
+
+            if not parent is None:
+                parent.append(new_elt)
+            parent = new_elt
+            new_elt = deepcopy(blank_elt)
+
+        # Add original children to last element.
+        for child in element.getchildren():
+            parent.append(child)
+
+        element.getparent().replace(element, new_root)

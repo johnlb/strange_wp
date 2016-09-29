@@ -12,9 +12,14 @@ general
 
 features
 ========
-- add block replacement mechanism (ie pch -> NW + PIMP)
-- <script> tag
-- dummy device / device matching mechanism
+- figure out hook system
+    + locations?
+        * pre-render (post-parse), post-render...
+        * how to present output for further scripting?
+    + <script> tag
+        * I guess location of tag determines which hook to use
+    + built-in hooks:
+        * dummy device / device matching mechanism
 - guard ring generation
 - element rotation
     + How to input? <fet rot=90> I guess?

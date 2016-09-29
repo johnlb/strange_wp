@@ -4,8 +4,6 @@ pch, nch {
 	border		: 1px solid
 }
 
-pch {layer		: PIMP;}
-nch {layer		: NIMP;}
 
 fet {
 	visibility	: visible;

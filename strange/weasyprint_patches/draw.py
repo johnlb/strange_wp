@@ -227,9 +227,9 @@ def draw_border_gds(cell, box, enable_hinting):
     # draw_column_border()
 
 
-def draw_rounded_border_gds(cell, box, style, color):
+def draw_rounded_border_gds(cell, box, style, layer):
     x,y,w,h, *_ = box.rounded_border_box()
-    draw_rect_border_gds(cell, (x,y,w,h), [], style, color)
+    draw_rect_border_gds(cell, (x,y,w,h), [], style, layer)
 
     # TO DO: add rounded border feature?
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
@@ -312,7 +312,7 @@ def draw_outlines_gds(cell, box, enable_hinting):
             box.border_width() + 2 * width, box.border_height() + 2 * width)
         draw_rect_border_gds(
             cell, outline_box, 4 * (width,), style,
-            styled_color(style, color, side))
+            box.style['layer'])
 
     if isinstance(box, boxes.ParentBox):
         for child in box.children:

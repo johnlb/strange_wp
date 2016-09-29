@@ -68,7 +68,7 @@ def _validate_layer(token):
         return token.value
     elif token.type=="STRING" or token.type=="IDENT":
         try:
-            return getattr(core_stackup, token.value)
+            return getattr(core_stackup, token.value.upper())
         except:
             pass
 
@@ -181,6 +181,12 @@ class Devices(object):
 
             # misc
             'layer'         : _compute_layer
+    }
+
+    layer_replace = {
+        #   tag name        : (outer_layer, nested_layer1, ...)
+            'pch'           : ('pw','pimp'),
+            'nch'           : ('nimp',)
     }
 
 
