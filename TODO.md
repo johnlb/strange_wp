@@ -12,23 +12,32 @@ general
 
 features
 ========
-- figure out hook system
-    + locations?
-        * pre-render (post-parse), post-render...
-        * how to present output for further scripting?
-    + <script> tag
-        * I guess location of tag determines which hook to use
-    + built-in hooks:
-        * dummy device / device matching mechanism
+
+high-priority
+-------------
+- dummy device / device matching mechanism
 - guard ring generation
 - element rotation
     + How to input? <fet rot=90> I guess?
     + L-R flip needed too... <fet flip=lr> or <fet flip=ud> I guess?
     + CSS3 transform support would be nice, but not primary use case
+- add em (as relative to init value) to validators
+- figure out what sort of interfaces an autorouter would need
+    + How to encode connection points?
+    + How to encode keepout zones?
+    + How to encode preferred routing zones?
+
+
+low-priority
+------------
+- hooks
+    + make separate hook locations?
+        * default location + user locations?
+        * how to specify user locations - env variable?
+    + Should I allow the <head> to talk to the <body>?
 - properties
     + move validators outside of core_cmos.py -- could auto-assign based on init values?
     + other computers?
-    + add em (as relative to init value) to validators
 - finish changeover to monkeypatched architecture
     + do thorough unit tests to be sure we got all the "scope" additions we need.
 - heirarchies
@@ -37,6 +46,8 @@ features
         * figure out directory search for ref tags (I think WP has this?)
     + <port layer=M1 name=VIN location=NW??>
         * Need a way to describe location on boundary
+- <!--[if TSMCN45]> ... some HTML here ... <![endif]-->
+    + match with <tech> tag?
 
 
 Architecture
@@ -49,10 +60,9 @@ Architecture
 
 wishlist
 ========
+- fix header parsing bug in html5lib
 - write library system for gdspy
 - add css variables to WeasyPrint?
-- <!--[if TSMCN45]> ... some HTML here ... <![endif]-->
-    + match with <tech> tag?
 - em notation as "relative to min. property dimension"
 
 

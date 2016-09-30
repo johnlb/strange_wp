@@ -55,7 +55,9 @@ html        = load_local_module('html')
 css         = load_local_module('css')
 technology  = load_local_module('technology')
 validation  = load_local_module('validation')
-computed_values = load_local_module('computed_values')
+header_script_sandbox   = load_local_module('header_script_sandbox')
+body_script_sandbox     = load_local_module('body_script_sandbox')
+computed_values         = load_local_module('computed_values')
 
 
 
@@ -182,15 +184,34 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     self._update_device_handlers()
     self._update_css_properties()
 
+    # Call builtin hooks
     self._replace_layer_hook(self.root_element, self.tech.Devices.layer_replace)
 
+    # Call user code in <head>
+    header_script_sandbox.root_element = self.root_element
+    for elt in self.root_element[0].iter('script'):
+        header_script_sandbox.execute(elt.text)
+
+
+
+    # Do layout.
     if not stylesheets:
         stylesheets = [self.tech.default_stylesheet]
     else:
         stylesheets.append(self.tech.default_stylesheet)
     
-    return self.render(stylesheets, presentational_hints).write_gds(
+    layout = self.render(stylesheets, presentational_hints).write_gds(
         target, zoom, attachments)
+
+
+
+    # Call user code in <body>
+    header_script_sandbox.root_element  = self.root_element
+    header_script_sandbox.layout        = layout
+    for elt in self.root_element[1].iter('script'):
+        header_script_sandbox.execute(elt.text)
+
+    return layout
 
 
 
