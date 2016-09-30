@@ -16,6 +16,7 @@ features
 high-priority
 -------------
 - dummy device / device matching mechanism
+- finger mechanism
 - guard ring generation
 - element rotation
     + How to input? <fet rot=90> I guess?

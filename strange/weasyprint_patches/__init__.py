@@ -30,7 +30,7 @@ import techlibs.containers as containers
 
 geometryContainer = containers.GeometryContainer
 
-scope   = None
+scope   = None      # set inside patch()
 
 
 ###############################################################################
@@ -189,6 +189,7 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
 
     # Call user code in <head>
     header_script_sandbox.root_element = self.root_element
+    header_script_sandbox.tech         = self.tech
     for elt in self.root_element[0].iter('script'):
         header_script_sandbox.execute(elt.text)
 
@@ -206,10 +207,11 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
 
 
     # Call user code in <body>
-    header_script_sandbox.root_element  = self.root_element
-    header_script_sandbox.layout        = layout
+    body_script_sandbox.root_element  = self.root_element
+    body_script_sandbox.layout        = layout
+    body_script_sandbox.tech          = self.tech
     for elt in self.root_element[1].iter('script'):
-        header_script_sandbox.execute(elt.text)
+        body_script_sandbox.execute(elt.text)
 
     return layout
 
@@ -229,7 +231,7 @@ def _update_tech_params(self):
         'mm': 1e-3 / self.tech.precision,
         'nm': 1e-9 / self.tech.precision,
         'um': 1e-6 / self.tech.precision,
-        'q': 96. / 25.4 / 4.,  # LENGTHS_TO_PIXELS['mm'] / 4
+        'q' : 1e-3 / self.tech.precision / 4.,  # LENGTHS_TO_PIXELS['mm'] / 4
     }
 
     # draw.py

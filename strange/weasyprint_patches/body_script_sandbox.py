@@ -17,7 +17,8 @@ from textwrap import dedent
 
 
 root_element = None     # Monkeypatched by HTML.write_gds()
-layout       = None 	# Monkeypatched by HTML.write_gds()
+layout       = None     # Monkeypatched by HTML.write_gds()
+tech         = None 	# Monkeypatched by HTML.write_gds()
 
 
 def execute(user_code):
