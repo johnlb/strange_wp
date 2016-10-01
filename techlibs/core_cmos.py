@@ -186,7 +186,8 @@ class Devices(object):
     layer_replace = {
         #   tag name        : (outer_layer, nested_layer1, ...)
             'pch'           : ('pw','pimp'),
-            'nch'           : ('nimp',)
+            'nch'           : ('nimp',),
+            'ntap'          : ('pimp','rx')
     }
 
 

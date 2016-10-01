@@ -1,0 +1,39 @@
+html{
+	box-sizing: border-box;
+}
+* {
+	box-sizing: inherit;
+}
+
+
+@page {
+	size: 5.6um 20um;
+}
+
+
+.center {
+	margin:auto;
+	width: 66%;
+}
+
+
+
+.ana {
+	ext-right:0.2;
+	ext-left:0.2;
+}
+
+
+.stacked_inner {
+	margin:-1px; 
+	height: 100%;
+}
+
+.stacked_outer {
+	padding:0px;
+}
+
+.hrail {
+	margin-left:0px;
+	margin-right:0px;	
+}

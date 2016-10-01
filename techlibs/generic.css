@@ -6,9 +6,52 @@ pch, nch {
 
 
 fet {
-	visibility	: visible;
 	padding		: 40nm;
 	margin		: 20nm;
-	padding		: 8px;
-	margin		: 4px;
 }
+
+
+ntap {
+	box-sizing  : padding-box;
+	border 		: 1px solid;
+	padding 	: 40nm;
+	margin 		: 0;
+	display 	: block;
+	margin 		: auto;
+	height 		: 100%;
+}
+ntap ntap { 	
+	/*applies to rx layer, after expansion*/
+	box-sizing	: padding-box;
+	height		: 100%;
+	width 		: 100%;
+}
+
+
+
+
+.rx, .po, .m1, .m2, .m3, .m4, .m5, .m6, .m7, .m8, .m9, .m10 {
+	border-style: solid;
+	border-width: 1px;
+}
+
+.rx {
+	layer: 		RX;
+	margin:		0.08um;
+}
+
+.po {
+	layer: 		PO;
+	margin:		0.1um;
+}
+
+.m1 {
+	layer: 		M1;
+	margin: 	0.07um;
+}
+
+.m2 {
+	layer: 		M2;
+	margin: 	0.07um;
+}
+

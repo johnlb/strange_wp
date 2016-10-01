@@ -1,0 +1,43 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="imirror.css">
+    <tech value="generic"></tech>
+</head>
+<body>
+
+    <!-- nch devices -->
+    <nch>
+        <!-- explicit gate routing (stacked po, m1) -->
+        <div class="po stacked_outer" style="height:200nm;" net="vmirror">
+            <div class="m1 stacked_inner" net="vmirror">
+            </div>
+        </div>
+
+
+        <fet id=M1@1 w=1u l=1u class=ana>
+            <io g=vmirror d=vmirror s=vss b=vss>
+        </fet>
+
+        <fet id=M1@2 w=1u l=1u class=ana>
+            <io g=vmirror d=iout1 s=vss b=vss>
+        </fet>
+
+        <fet id=M1@3 w=1u l=1u class=ana>
+            <io g=vmirror d=iout2 s=vss b=vss>
+        </fet>
+    </nch>
+
+
+
+    <!-- VSS -->
+    <div class="m1 hrail" style="height:1um; padding:40nm" net="vss">
+        <ntap style="" net="vss"></ntap>
+    </div>
+
+<!-- 
+    <script type="text/python">
+        from .routers import simple_router
+        simple_router.route(layout,['vmirror','iout1', 'iout2', 'vss'])
+    </script>
+ -->
+ </body>

@@ -2,6 +2,7 @@ updated: 9/8/16
 
 general
 =======
+- fix 1-px errors in box drawing
 - build unit tests
 - feature buildout
 - make example designs
@@ -15,6 +16,7 @@ features
 
 high-priority
 -------------
+- autorouting interface
 - dummy device / device matching mechanism
 - finger mechanism
 - guard ring generation
@@ -36,6 +38,7 @@ low-priority
         * default location + user locations?
         * how to specify user locations - env variable?
     + Should I allow the <head> to talk to the <body>?
+- more powerful layer_replace mechanism?
 - properties
     + move validators outside of core_cmos.py -- could auto-assign based on init values?
     + other computers?
@@ -49,6 +52,14 @@ low-priority
         * Need a way to describe location on boundary
 - <!--[if TSMCN45]> ... some HTML here ... <![endif]-->
     + match with <tech> tag?
+
+
+Auto Routing
+============
+- via tool
+- auto connect overlapping layers on same net
+- simple metal extension routing
+
 
 
 Architecture

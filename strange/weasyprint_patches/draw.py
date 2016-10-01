@@ -257,7 +257,7 @@ def draw_rect_border_gds(cell, box, widths, style, layer):
 
     bbx, bby, bbw, bbh = box
     # bt, br, bb, bl = widths
-    
+
     # PPU is Pixels per Unit (UNITS/PRECISION)  
     bbx /= PPU
     bby /= PPU
