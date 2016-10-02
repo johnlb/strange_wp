@@ -26,9 +26,9 @@ import imp
 from lxml import etree
 from copy import deepcopy
 
-import techlibs.containers as containers
+from strange import containers
 
-geometryContainer = containers.GeometryContainer
+# geometryContainer = containers.GeometryContainer
 
 scope   = None      # set inside patch()
 
@@ -112,6 +112,7 @@ def patch(wp):
     doc.draw_page_gds                   = wp_draw.draw_page_gds
     wp_doc.Page.paint_gds               = doc.paint_gds
     wp_doc.Document.write_gds           = doc.write_gds
+    wp_doc.Document.build_layout        = doc.build_layout
 
 
     # css.py
@@ -201,8 +202,10 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     else:
         stylesheets.append(self.tech.default_stylesheet)
     
-    layout = self.render(stylesheets, presentational_hints).write_gds(
-        target, zoom, attachments)
+    doc     = self.render(stylesheets, presentational_hints)
+    layout  = doc.build_layout(zoom, attachments, self.tech)
+    # layout = self.render(stylesheets, presentational_hints).write_gds(
+    #     target, zoom, attachments, self.tech)
 
 
 
@@ -213,7 +216,8 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     for elt in self.root_element[1].iter('script'):
         body_script_sandbox.execute(elt.text)
 
-    return layout
+
+    return doc.write_gds(layout, self.tech, target)
 
 
 

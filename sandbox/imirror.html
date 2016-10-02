@@ -34,10 +34,12 @@
         <ntap style="" net="vss"></ntap>
     </div>
 
-<!-- 
+
     <script type="text/python">
-        from .routers import simple_router
-        simple_router.route(layout,['vmirror','iout1', 'iout2', 'vss'])
+        from strange.routers import simple_router
+        router = simple_router()
+        remainder = router.route(layout,['vmirror','iout1', 'iout2', 'vss'])
+        print(remainder)
     </script>
- -->
+
  </body>

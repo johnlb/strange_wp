@@ -68,11 +68,11 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
             bottom = box.border_height()
         if left == 'auto':
             left = box.border_width()
-        cell.rectangle(
-            box.border_box_x() + right,
-            box.border_box_y() + top,
-            left - right,
-            bottom - top)
+        cell.add(gdspy.Rectangle(
+                    box.border_box_x() + right,
+                    box.border_box_y() + top,
+                    left - right,
+                    bottom - top))
         # cell.clip()
 
 
@@ -330,7 +330,7 @@ def draw_replacedbox_gds(cell, box):
     cbx = box.content_box_x()
     cby = box.content_box_y()
     box.replacement.translate_px( [cbx, -cby] )
-    box.replacement.draw(cell)
+    cell.add(box.replacement)
     # box.replacement.draw(
     #     cell, box.width, box.height, box.style.image_rendering)
 

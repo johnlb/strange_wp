@@ -8,8 +8,8 @@ import gdspy
 import math
 
 from . import core_stackup
-from .containers import GeometryContainer
-
+from strange.containers import DeviceContainer
+from strange import LibTools
 
 
 
@@ -134,7 +134,7 @@ class Devices(object):
             'co_existsl'    : True,
             'co_existsr'    : True,
             'ext_top'       : 0.1,
-            'ext_bot'       : 0.1,
+            'ext_bottom'    : 0.1,
             'ext_left'      : 0.1,
             'ext_right'     : 0.1,
 
@@ -153,7 +153,7 @@ class Devices(object):
             'co_existsl'    : _validate_bool,
             'co_existsr'    : _validate_bool,
             'ext_top'       : _validate_number,
-            'ext_bot'       : _validate_number,
+            'ext_bottom'    : _validate_number,
             'ext_left'      : _validate_number,
             'ext_right'     : _validate_number,
 
@@ -172,7 +172,7 @@ class Devices(object):
             'co_existsl'    : _compute_bool,
             'co_existsr'    : _compute_bool,
             'ext_top'       : _compute_distance,
-            'ext_bot'       : _compute_distance,
+            'ext_bottom'    : _compute_distance,
             'ext_left'      : _compute_distance,
             'ext_right'     : _compute_distance,
 
@@ -202,8 +202,9 @@ class Devices(object):
                 l, w,
                 co_size=0.04, co_space=0.03, co_offsety=0, co_offsetx=0,
                 co_existsl=True,    co_existsr=True,
-                ext_top=0.1,        ext_bot=0.1,
+                ext_top=0.1,        ext_bottom=0.1,
                 ext_left=0.1,       ext_right=0.1,
+                g='',s='',d='',b='',
                 **kwargs
             ) :
 
@@ -222,8 +223,9 @@ class Devices(object):
         style dictionary with more entries than those required by this
         function.
 
-        Returns: geometryContainer
-            A geometryContainer with all gdspy geometries for this device.
+        Returns: (geometry_container, netlist)
+            A DeviceContainer object with all gdspy geometries 
+            for this device and the netlist 
         """
 
         if l<=0:
@@ -232,16 +234,16 @@ class Devices(object):
             raise Exception("FATAL: Can't have negative width device.")
 
         # Draw gate
-        gate = gdspy.Rectangle((0,ext_top), (l,-(w+ext_bot)), core_stackup.PO);
+        gate = gdspy.Rectangle((0,ext_top), (l,-(w+ext_bottom)), core_stackup.PO);
 
-        # Draw RX
+        # Draw active area
         active = gdspy.Rectangle(
                         (-ext_left,0),
                         (l+ext_right,-w),
                         core_stackup.RX
                     );
 
-        # Draw CO
+        # Draw contacts
         num_co        = int( math.floor((w - co_space)/(co_space + co_size)) )
         co_inset_y    = (w - co_size - (num_co-1)*(co_space + co_size))/2.0;
         # from bot left of contact
@@ -261,16 +263,27 @@ class Devices(object):
                                      (co_pos_xright+co_size,thisY+co_size),
                                       core_stackup.CO )]
 
+        # Build Netlist
+        interface = LibTools.generate_device_interface( \
+            ('g',  's',           'd',            'b'),
+            ( g ,   s ,            d ,             b ),
+            ( gate, contacts_left, contacts_right, []) \
+        )
+
         # Build Container
         geometeries = [gate, active] + contacts_left + contacts_right
-        extents = (+ext_top, l+ext_right, -(w+ext_bot), -ext_left)
-        return GeometryContainer(geometeries, extents, self.tech).translate( \
-                                    (-extents[3], -extents[0]) )
+        extents = (+ext_top, l+ext_right, -(w+ext_bottom), -ext_left)
+        return DeviceContainer(geometeries, interface, self.tech,
+                                extents).translate(
+                                               (-extents[3],
+                                                -extents[0]) )
+
 
 
     def res_poly ( self, 
                    l, w, 
                    ext=0.1, co_size=0.04, co_space=0.03,
+                   p='', n='',
                    **kwargs ) :
         """
         Responsible for drawing a fundamental poly resistor.
@@ -285,14 +298,15 @@ class Devices(object):
         **kwargs is ignored. It is included to allow for passing of a style
         dictionary with more entries than those required by this function.
 
-        Returns: geometryContainer
-            A geometryContainer with all gdspy geometries for this device.
+        Returns: (geometry_container, interface)
+            A DeviceContainer object with all gdspy geometries 
+            for this device and the interface 
         """
 
-        # Draw PO
+        # Draw poly
         poly = gdspy.Rectangle((-ext,0), (l+ext,-w), core_stackup.PO);
 
-        # Draw CO
+        # Draw contacts
         num_co       = int( math.floor((w - co_space)/(co_space + co_size)) )
         co_inset_y    = (w - co_size - (num_co-1)*(co_space + co_size))/2.0;
         co_pos_xleft  = -co_size   # from bot left of contact
@@ -311,10 +325,19 @@ class Devices(object):
                                      (co_pos_xright+co_size,thisY+co_size),
                                       core_stackup.CO )]
 
+        # Build Netlist
+        interface = LibTools.generate_device_interface( \
+            ('p',           'n'),
+            ( p ,            n ),
+            ( contacts_left, contacts_right) \
+        )
+
         # Build Container
         geometeries = [poly] + contacts_left + contacts_right
         extents = (0., l+ext, w, -ext)
-        return GeometryContainer(geometeries, extents, self.tech).translate( \
-                                    (-extents[3], -extents[0]) )
+        return DeviceContainer(geometeries, netlist, self.tech,
+                                interface, extents).translate(
+                                                        (-extents[3],
+                                                         -extents[0]) )
 
 

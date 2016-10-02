@@ -40,9 +40,14 @@ def make_fn(fn_to_use):
 
         Treated similar to ``object`` element.
         """
-        elt_attrib = sanitize_attrib(element.attrib) 
+        io = element.find('io').attrib
+        elt_attrib = sanitize_attrib(element.attrib)
+        try:
+            elt_attrib.update(io)
+        except AttributeError:
+            pass
         kwargs = generate_args(elt_attrib, box.style)
-        # if 'fet' in lib:
+        
         try:
             geometries = fn_to_use(**kwargs)
             return [scope.make_replaced_box(element, box, geometries)]

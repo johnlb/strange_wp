@@ -19,8 +19,10 @@ html{
 
 
 .ana {
-	ext-right:0.2;
-	ext-left:0.2;
+	ext-top 	:0.11;
+	ext-bottom 	:0.11;
+	ext-right	:0.2;
+	ext-left	:0.2;
 }
 
 

@@ -80,3 +80,12 @@ PIN8 = 38
 PIN9 = 39
 PIN10= 40
 
+
+
+# Layer Use Declarations - for routing
+metal_layers = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10']
+poly_layers  = ['PO']
+via_layers   = ['CO', 
+				'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10']
+pin_layers 	 = ['PIN1', 'PIN2', 'PIN3', 'PIN4', 'PIN5',
+				'PIN6', 'PIN7', 'PIN8', 'PIN9', 'PIN10']

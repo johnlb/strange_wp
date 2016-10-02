@@ -2,15 +2,82 @@ import numpy as np
 import math
 
 
-class GeometryContainer():
-	"""
-	Holds a set of geometries and provides basic manipulations.
 
-	Parameters
-	----------
-	_geometries : list of translatable gdspy geometry objects.
-	"""
+class GenericContainer(object):
+	"""Base-class for all geometry containers. Not meant to be used directly"""
 
+	@property
+	def netlist(self):
+		return self._netlist
+
+	@netlist.setter
+	def netlist(self, netlist):
+		self._netlist = netlist
+
+
+	def __init__(self, geometries=[], netlist={}, tech=None):
+		self.tech 	= tech
+		self.PPU	= self.tech.units / self.tech.precision
+
+		self._geometries = geometries
+		self._netlist = netlist
+
+
+	def add(self, geometry):
+		self._geometries.append(geometry)
+
+
+
+
+
+
+
+
+class CellContainer(GenericContainer):
+	"""Holds both bare geometries and DeviceContainers. For complete layouts"""
+
+	def __init__(self, geometries=[], netlist={}, tech=None):
+		super().__init__(geometries, netlist, tech)
+		self._devices = []
+
+
+	def add(self, obj, net=''):
+		if isinstance(obj, DeviceContainer):
+			self._devices.append(obj)
+			# add device's interface to overall netlist
+			interface = obj.netlist
+			for pin in interface.values():
+				net 		= pin[0]
+				geometries  = pin[1]
+				self._add_to_netlist(net, obj)
+
+		else:
+			self._geometries.append(obj)
+			self._add_to_netlist(net, obj)
+
+
+	def _add_to_netlist(self, net, obj):
+		if net!='':
+			self._netlist[net] = obj
+
+
+	def draw(self, context):
+		for geo in self._geometries:
+			context.add(geo)
+		for dev in self._devices:
+			dev.draw(context)
+
+
+
+
+
+
+
+class DeviceContainer(GenericContainer):
+	"""Holds a set of geometries and provides basic manipulations."""
+
+
+	
 	@property
 	def extent_left(self):
 	    return self._extent_left
@@ -35,11 +102,9 @@ class GeometryContainer():
 	
 	
 
-	def __init__(self, geometries, extents, tech):
-		self.tech 	= tech
-		self.PPU	= self.tech.units / self.tech.precision
+	def __init__(self, geometries, netlist, tech, extents=None):
 
-		self._geometries = geometries
+		super().__init__(geometries, netlist, tech)
 		self._update_extents(geometries)
 
 		try:
@@ -149,9 +214,12 @@ class GeometryContainer():
 		"""
 
 		[cell.add(geo) for geo in self._geometries]
-		return
+
 
 	
 	def _update_extents(self, geometries):
 		"""Updates the extents based on a new set of geometries"""
-		
+		# TODO: finish this.
+		pass
+
+

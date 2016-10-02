@@ -25,7 +25,7 @@ import sys
 import weasyprint as wp
 import gdspy
 
-import strange.weasyprint_patches as wp_patches
+from . import weasyprint_patches as wp_patches
 
 
 VERSION = '0.0'
@@ -57,3 +57,41 @@ wp_patches.patch(wp)
 ###############################################################################
 
 HTML = wp.HTML
+
+
+
+###############################################################################
+# Tools for library creation.
+###############################################################################
+
+class LibTools(object):
+    """Container class for strange's library creation tools."""
+
+    @classmethod
+    def generate_device_interface(cls, pins, nets, geometries):
+        """Create an interface that associates a device's ``pins`` with the
+        ``nets`` they connect to and the ``geometries`` that represent that
+        interface.
+        """
+
+        interface = {}
+        for ii, pin in enumerate(pins):
+            interface[pin] = (nets[ii], geometries[ii])
+
+        return interface
+
+
+    # @classmethod
+    # def generate_netlist(cls, nets, geometries, interfaces):
+    #     """Create a ``netlist`` dictionary which connects each net in ``nets``
+    #     to the explicit geometry objects that act as said interface.
+    #     """
+
+    #     netlist = {}
+    #     for net in nets:
+
+
+    #     for ii, pin in enumerate(pins):
+    #         netlist[pin] = (nets[ii], geometries[ii])
+
+    #     return netlist

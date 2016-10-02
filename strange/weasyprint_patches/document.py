@@ -8,6 +8,7 @@
 """
 
 import gdspy
+from strange import containers
 draw_page_gds = None # imported by patch()
 
 # Page.paint_gds
@@ -68,7 +69,37 @@ def paint_gds(self, cell, left_x=0, top_y=0, scale=1, clip=False):
 
 
 # Document.write_gds
-def write_gds(self, target=None, zoom=1, attachments=None):
+def write_gds(self, layout, tech, target=None):
+    """Paint the pages in a GDS file, with meta-data.
+
+    :param target:
+        A filename, file-like object, or :obj:`None`.
+    :returns:
+        list of gdspy.Cell objects, each corresponding to one page. 
+    """
+    # TODO: add custom cell names
+    cells = []
+    for ii, cell in enumerate(layout):
+        this_cell = gdspy.Cell('page ' + str(ii))
+        cell.draw(this_cell)
+
+    # Don't think I need this...
+    # write_pdf_metadata(self, file_obj, scale, self.metadata, attachments,
+    #                    self.url_fetcher)
+
+    if target is None:
+        return cells
+    else:
+        # Cells are already a part of gdspy, don't need to add them.
+        # TODO: add multi-lib support in gdspy
+        gdspy.gds_print(target, unit=tech.units,
+                                precision=tech.precision)
+
+
+
+
+# Document.write_gds
+def build_layout(self, zoom=1, attachments=None, tech=None):
     """Paint the pages in a GDS file, with meta-data.
 
     :param target:
@@ -88,23 +119,16 @@ def write_gds(self, target=None, zoom=1, attachments=None):
         generated GDS document or :obj:`None`. The list's elements are
         :class:`Attachment` objects, filenames, URLs or file-like objects.
     :returns:
-        list of gdspy.Cell objects, each corresponding to one page. 
+        list of CellContainer objects, each corresponding to one page. 
     """
-    # TODO: add control over unit/precision
     cells = []
     for ii, page in enumerate(self.pages):
-        this_cell = gdspy.Cell('page ' + str(ii))
+        this_cell = containers.CellContainer(tech=tech)
         page.paint_gds(this_cell)
-        cells += [this_cell]
-        # cells = cells.append(this_cell)
+        cells.append(this_cell)
 
     # Don't think I need this...
     # write_pdf_metadata(self, file_obj, scale, self.metadata, attachments,
     #                    self.url_fetcher)
 
-    if target is None:
-        return cells
-    else:
-        # Cells are already a part of gdspy, don't need to add them.
-        # FINISH ME: add multi-lib support in gdspy
-        gdspy.gds_print(target, unit=1.0e-6, precision=5.0e-9)
+    return cells

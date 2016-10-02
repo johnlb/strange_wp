@@ -52,6 +52,7 @@ low-priority
         * Need a way to describe location on boundary
 - <!--[if TSMCN45]> ... some HTML here ... <![endif]-->
     + match with <tech> tag?
+- add better cell naming
 
 
 Auto Routing
@@ -67,7 +68,9 @@ Architecture
 - is there a better way to maintain all the validate and compute functions?
     + sep. lib?
 - am I doing validation/computing correctly?
-- 
+- encapsulate netlist creation so implementation details are not needed.
+    + need to put it in strange's __init__.py so user libs can import it.
+        * any other things this can be used for?
 
 
 wishlist
