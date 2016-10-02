@@ -12,20 +12,6 @@ import tinycss
 
 tech = None
 
-###############################################################################
-# This is for __init__.py
-###############################################################################
-
-def create_hook(wp):
-    @staticmethod
-    def update_device_handlers(tech_):
-        global tech
-        tech = tech_
-        wp.html.register_device_handlers()
-
-    return update_device_handlers
-
-
 
 ###############################################################################
 # The rest go into html.py
@@ -47,7 +33,7 @@ def make_fn(fn_to_use):
         except AttributeError:
             pass
         kwargs = generate_args(elt_attrib, box.style)
-        
+
         try:
             geometries = fn_to_use(**kwargs)
             return [scope.make_replaced_box(element, box, geometries)]

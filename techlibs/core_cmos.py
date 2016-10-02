@@ -1,5 +1,5 @@
-"""
-Drawing functions for basic, process agnostic devices.
+# coding: utf-8
+"""Drawing functions for basic, process agnostic devices.
 
 Process-specific features should be added on top of these devices.
 """
@@ -10,55 +10,6 @@ import math
 from . import core_stackup
 from strange.containers import DeviceContainer
 from strange import LibTools
-
-
-
-# TODO: move this somewhere else
-def _validate_bool(token):
-    token = token[0]
-    if token.type=='STRING':
-        if token.value.lower() == 'true':
-            return True
-        elif token.value.lower() == 'false':
-            return False
-    elif token.type=='IDENT':
-        if token.value.lower() == 'true':
-            return True
-        elif token.value.lower() == 'false':
-            return False
-
-
-def _validate_number(token):
-    units_si = {
-        'Y': 1e24,  # yotta
-        'Z': 1e21,  # zetta
-        'E': 1e18,  # exa
-        'P': 1e15,  # peta
-        'T': 1e12,  # tera
-        'G': 1e9,   # giga
-        'M': 1e6,   # mega
-        'K': 1e3,   # kilo
-        'c': 1e-2,  # centi
-        'm': 1e-3,  # milli
-        'u': 1e-6,  # micro
-        'n': 1e-9,  # nano
-        'p': 1e-12, # pico
-        'f': 1e-15, # femto
-        'a': 1e-18, # atto
-        'z': 1e-21, # zepto
-        'y': 1e-24  # yocto
-    }
-
-    token = token[0]
-    if token.type == 'INTEGER' or token.type == 'NUMBER':
-        return token.value
-
-    # TODO: support dimension
-    # elif token.type == 'DIMENSION':
-    #     if token.unit == 'px':
-    #         return token.value * (self.tech.precision/self.tech.units)
-    #     else:
-    #         return token.value * units_si[token.unit[0]]/self.tech.units
 
 
 
@@ -73,54 +24,11 @@ def _validate_layer(token):
             pass
 
 
-def _compute_distance(computer, name, value):
-    """Compute a property expecting ``distance`` type"""
-    # TODO : add other computations?
-    # if value.unit == '%':
-    #     return value.value * parent_font_size / 100.
-    # else:
-    #     return value.value
-    return value
-
-
-def _compute_bool(computer, name, value):
-    """Compute a property expecting ``boolean`` type"""
-    # TODO: What do I have to do here?
-    return value
-
-
 def _compute_layer(computer, name, value):
     """Compute the ``layer`` property"""
     # TODO: What do I have to do here?
     return value
 
-
-# def contactHelper( bbH, bbW, 
-#                    COsize=0.04, COspace=0.03,
-#                    COoffsetY=0, COoffsetX=0 ) :
-#   """
-#   Draws vertical column of contacts centered within an imaginary box
-#   of height bbH and width bbW.
-
-#   The origin of the result is at the upper left corner of the box.
-
-#   Returns: list of gdspy geometry objects, following the standard 
-#            layer stackup.
-#   """
-
-#   numCO       = math.floor((bbH - COspace)/(COspace + COsize))
-#   COinsetY    = (bbH - COsize - (numCO-1)*(COspace + COsize))/2.0 - \
-#                   COoffsetY;
-#   # from top left of contact
-#   COposX      = -(rxextleft/2.0 + COsize/2.0 + COoffsetX)
-    
-#   contacts = []
-#   for ii in range(numCO):
-#       thisY = -COinsetY - ii*(COsize+COspace) 
-#       contacts = contacts + [
-#                   gdspy.Rectangle( (COposX,thisY),
-#                                    (COposX+COsize,thisY-COsize),
-#                                    core_stackup.CO )]
 
 
 class Devices(object):
@@ -146,38 +54,38 @@ class Devices(object):
     }
     validators = {
             # fet
-            'co_size'       : _validate_number,
-            'co_space'      : _validate_number,
-            'co_offsety'    : _validate_number,
-            'co_offsetx'    : _validate_number,
-            'co_existsl'    : _validate_bool,
-            'co_existsr'    : _validate_bool,
-            'ext_top'       : _validate_number,
-            'ext_bottom'    : _validate_number,
-            'ext_left'      : _validate_number,
-            'ext_right'     : _validate_number,
+            'co_size'       : LibTools.validate_number,
+            'co_space'      : LibTools.validate_number,
+            'co_offsety'    : LibTools.validate_number,
+            'co_offsetx'    : LibTools.validate_number,
+            'co_existsl'    : LibTools.validate_bool,
+            'co_existsr'    : LibTools.validate_bool,
+            'ext_top'       : LibTools.validate_number,
+            'ext_bottom'    : LibTools.validate_number,
+            'ext_left'      : LibTools.validate_number,
+            'ext_right'     : LibTools.validate_number,
 
             # res_poly
-            'ext'           : _validate_number,
+            'ext'           : LibTools.validate_number,
 
             # misc
             'layer'         : _validate_layer
     }
     computers = {
             # fet
-            'co_size'       : _compute_distance,
-            'co_space'      : _compute_distance,
-            'co_offsety'    : _compute_distance,
-            'co_offsetx'    : _compute_distance,
-            'co_existsl'    : _compute_bool,
-            'co_existsr'    : _compute_bool,
-            'ext_top'       : _compute_distance,
-            'ext_bottom'    : _compute_distance,
-            'ext_left'      : _compute_distance,
-            'ext_right'     : _compute_distance,
+            'co_size'       : LibTools.compute_distance,
+            'co_space'      : LibTools.compute_distance,
+            'co_offsety'    : LibTools.compute_distance,
+            'co_offsetx'    : LibTools.compute_distance,
+            'co_existsl'    : LibTools.compute_bool,
+            'co_existsr'    : LibTools.compute_bool,
+            'ext_top'       : LibTools.compute_distance,
+            'ext_bottom'    : LibTools.compute_distance,
+            'ext_left'      : LibTools.compute_distance,
+            'ext_right'     : LibTools.compute_distance,
 
             # res_poly
-            'ext'           : _compute_distance,
+            'ext'           : LibTools.compute_distance,
 
             # misc
             'layer'         : _compute_layer

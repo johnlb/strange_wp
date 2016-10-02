@@ -67,6 +67,9 @@ HTML = wp.HTML
 class LibTools(object):
     """Container class for strange's library creation tools."""
 
+    stackup = None
+
+    ### Device Tools
     @classmethod
     def generate_device_interface(cls, pins, nets, geometries):
         """Create an interface that associates a device's ``pins`` with the
@@ -81,17 +84,72 @@ class LibTools(object):
         return interface
 
 
-    # @classmethod
-    # def generate_netlist(cls, nets, geometries, interfaces):
-    #     """Create a ``netlist`` dictionary which connects each net in ``nets``
-    #     to the explicit geometry objects that act as said interface.
-    #     """
+    ### CSS Validators
+    @staticmethod
+    def validate_bool(token):
+        token = token[0]
+        if token.type=='STRING':
+            if token.value.lower() == 'true':
+                return True
+            elif token.value.lower() == 'false':
+                return False
+        elif token.type=='IDENT':
+            if token.value.lower() == 'true':
+                return True
+            elif token.value.lower() == 'false':
+                return False
 
-    #     netlist = {}
-    #     for net in nets:
+
+    @staticmethod
+    def validate_number(token):
+        units_si = {
+            'Y': 1e24,  # yotta
+            'Z': 1e21,  # zetta
+            'E': 1e18,  # exa
+            'P': 1e15,  # peta
+            'T': 1e12,  # tera
+            'G': 1e9,   # giga
+            'M': 1e6,   # mega
+            'K': 1e3,   # kilo
+            'c': 1e-2,  # centi
+            'm': 1e-3,  # milli
+            'u': 1e-6,  # micro
+            'n': 1e-9,  # nano
+            'p': 1e-12, # pico
+            'f': 1e-15, # femto
+            'a': 1e-18, # atto
+            'z': 1e-21, # zepto
+            'y': 1e-24  # yocto
+        }
+
+        token = token[0]
+        if token.type == 'INTEGER' or token.type == 'NUMBER':
+            return token.value
+
+        # TODO: support dimension
+        # elif token.type == 'DIMENSION':
+        #     if token.unit == 'px':
+        #         return token.value * (self.tech.precision/self.tech.units)
+        #     else:
+        #         return token.value * units_si[token.unit[0]]/self.tech.units
 
 
-    #     for ii, pin in enumerate(pins):
-    #         netlist[pin] = (nets[ii], geometries[ii])
 
-    #     return netlist
+    ### CSS Computers
+    @staticmethod
+    def compute_distance(computer, name, value):
+        """Compute a property expecting ``distance`` type"""
+        # TODO : add other computations?
+        # if value.unit == '%':
+        #     return value.value * parent_font_size / 100.
+        # else:
+        #     return value.value
+        return value
+
+
+    @staticmethod
+    def compute_bool(computer, name, value):
+        """Compute a property expecting ``boolean`` type"""
+        # TODO: What do I have to do here?
+        return value
+

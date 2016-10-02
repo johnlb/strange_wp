@@ -17,14 +17,18 @@ def register_computers(device_builder):
     # properties_gds = {
     #     'layer'     : ''
     # }
+    computer_dict = device_builder.computers
+    # add builtins
+    computer_dict['net'] = _compute_net
 
 
     computers = []
-    for name, func in device_builder.computers.items():
+    for name, func in computer_dict.items():
         name = name.replace('_', '-')
         # can't use @decorator for dynamic functions :-/
-        # decorator = scope.single_token(scope.validator(name))
         decorator = scope.register_computer(name)
         computers.append(decorator((func)))
 
 
+def _compute_net(computer, name, value):
+    return value

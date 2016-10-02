@@ -68,11 +68,16 @@ def draw_stacking_context_gds(cell, stacking_context, enable_hinting):
             bottom = box.border_height()
         if left == 'auto':
             left = box.border_width()
+
+        try:
+            net = box.style['net']
+        except:
+            net = ''
         cell.add(gdspy.Rectangle(
                     box.border_box_x() + right,
                     box.border_box_y() + top,
                     left - right,
-                    bottom - top))
+                    bottom - top), net)
         # cell.clip()
 
 
@@ -207,7 +212,8 @@ def draw_border_gds(cell, box, enable_hinting):
     # if set(styles) in (set(('solid',)), set(('double',))) and (
     #         len(set(colors)) == 1):
     if set(styles) in (set(('solid',)), set(('double',))):
-        draw_rounded_border_gds(cell, box, styles[0], box.style['layer'])
+        draw_rounded_border_gds(cell, box, styles[0], box.style)
+        # draw_rounded_border_gds(cell, box, styles[0], box.style['layer'])
         # draw_column_border()
         return
 
@@ -227,9 +233,9 @@ def draw_border_gds(cell, box, enable_hinting):
     # draw_column_border()
 
 
-def draw_rounded_border_gds(cell, box, style, layer):
+def draw_rounded_border_gds(cell, box, style, params):
     x,y,w,h, *_ = box.rounded_border_box()
-    draw_rect_border_gds(cell, (x,y,w,h), [], style, layer)
+    draw_rect_border_gds(cell, (x,y,w,h), [], style, params)
 
     # TO DO: add rounded border feature?
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
@@ -251,23 +257,30 @@ def draw_rounded_border_gds(cell, box, style, layer):
     # context.fill()
 
 
-def draw_rect_border_gds(cell, box, widths, style, layer):
+def draw_rect_border_gds(cell, box, widths, style, params):
     PPU = scope.PPU
+    layer = params['layer']
 
-
+    
     bbx, bby, bbw, bbh = box
     # bt, br, bb, bl = widths
+
+    try:
+        net = params['net']
+    except:
+        net = ''
 
     # PPU is Pixels per Unit (UNITS/PRECISION)  
     bbx /= PPU
     bby /= PPU
     bbw /= PPU
     bbh /= PPU
-    cell.add(  
-        gdspy.Rectangle((bbx, -bby),
-        (bbx+bbw, -(bby+bbh)), layer) )
+    cell.add( gdspy.Rectangle((bbx, -bby),
+              (bbx+bbw, -(bby+bbh)), layer), net )
 
     # TO DO: add more interesting border style features.
+
+
     # context.set_fill_rule(cairo.FILL_RULE_EVEN_ODD)
     # bbx, bby, bbw, bbh = box
     # bt, br, bb, bl = widths
@@ -303,7 +316,6 @@ def draw_outlines_gds(cell, box, enable_hinting):
     boxes = scope.boxes
 
     width = box.style.outline_width
-    # TO DO: make this 'layer'
     color = box.style.get_color('outline_color')
     style = box.style.outline_style
     if box.style.visibility == 'visible' and width != 0:

@@ -8,8 +8,8 @@
     <!-- nch devices -->
     <nch>
         <!-- explicit gate routing (stacked po, m1) -->
-        <div class="po stacked_outer" style="height:200nm;" net="vmirror">
-            <div class="m1 stacked_inner" net="vmirror">
+        <div class="po stacked_outer hrail" style="height:200nm;" net="vmirror">
+            <div class="m1 stacked_inner hrail" net="vmirror">
             </div>
         </div>
 
@@ -36,9 +36,8 @@
 
 
     <script type="text/python">
-        from strange.routers import simple_router
-        router = simple_router()
-        remainder = router.route(layout,['vmirror','iout1', 'iout2', 'vss'])
+        from strange.routers import SimpleRouter as Router
+        remainder = Router.route(layout,['vmirror','iout1', 'iout2', 'vss'])
         print(remainder)
     </script>
 

@@ -87,6 +87,7 @@ def patch(wp):
     wp.HTML._update_device_handlers = _update_device_handlers
     wp.HTML._update_css_properties  = _update_css_properties
     wp.HTML._replace_layer_hook     = _replace_layer_hook
+    wp.HTML._replace_nets_hook      = _replace_nets_hook
     wp.HTML.write_gds 				= write_gds
 
 
@@ -186,7 +187,8 @@ def write_gds(self, target=None, stylesheets=None, zoom=1,
     self._update_css_properties()
 
     # Call builtin hooks
-    self._replace_layer_hook(self.root_element, self.tech.Devices.layer_replace)
+    self._replace_layer_hook(self.root_element)
+    self._replace_nets_hook(self.root_element)
 
     # Call user code in <head>
     header_script_sandbox.root_element = self.root_element
@@ -272,6 +274,8 @@ def _update_css_properties(self):
     val_scope  = scope.css.validation
     comp_scope = scope.css.computed_values
 
+    properties = prop_scope.INITIAL_VALUES
+    properties['net'] = ''
 
     # Define appropriate initial values
     device_builder = scope.html.device_builder
@@ -279,7 +283,7 @@ def _update_css_properties(self):
 
     # Recalculate this from INITIAL_VALUES
     prop_scope.KNOWN_PROPERTIES = set(name.replace('_', '-') \
-            for name in prop_scope.INITIAL_VALUES)
+            for name in properties)
 
 
 
@@ -304,7 +308,7 @@ def _update_css_properties(self):
 
 
 
-def _replace_layer_hook(self, element, replace):
+def _replace_layer_hook(self, element):
     """Replace any tags matching keys in "replace" with tags in the
     corresponding value.
 
@@ -320,9 +324,11 @@ def _replace_layer_hook(self, element, replace):
             new_elt.remove(e)
         return new_elt
 
+    replace = self.tech.Devices.layer_replace
+
     # Replace any child tags first.
     for e in element.getchildren():
-        self._replace_layer_hook(e, replace)
+        self._replace_layer_hook(e)
 
     # Replace current tag, if necessary
     if element.tag in replace:
@@ -348,3 +354,20 @@ def _replace_layer_hook(self, element, replace):
             parent.append(child)
 
         element.getparent().replace(element, new_root)
+
+
+
+def _replace_nets_hook(self, element):
+    """Move any attrib called ``net`` inside style."""
+
+    for e in element.getchildren():
+        self._replace_nets_hook(e)
+
+    if 'net' in element.attrib:
+        try:
+            orig_style = element.attrib['style']
+        except KeyError:
+            orig_style = ''
+
+        element.attrib['style'] = 'net:"' + element.attrib['net'] + '";' + \
+                                    orig_style

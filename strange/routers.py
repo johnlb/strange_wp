@@ -7,9 +7,9 @@
 
 """
 
-class simple_router(object):
-	@staticmethod
-	def route(layout, nets):
+class SimpleRouter(object):
+	@classmethod
+	def route(cls, layout, nets):
 		"""Route each net listed in ``nets``
 
 		Returns the ratsnest that remains unrouted.

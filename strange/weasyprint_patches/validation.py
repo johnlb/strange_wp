@@ -32,20 +32,24 @@ def register_validators(device_builder):
 
     # TODO: support 'layer' property
     # some standard properties to add-on
-    # properties_gds = {
-    #     'layer'     : ''
-    # }
 
-    # validators_gds = {
-    #     'layer'     :
-    # }
+    validator_dict = device_builder.validators
+    # add builtins
+    validator_dict['net'] = _validate_net
 
     validators = []
-    for name, func in device_builder.validators.items():
+    for name, func in validator_dict.items():
         name = name.replace('_', '-')
         # can't use @decorator for dynamic functions :-/
-        # decorator = scope.single_token(scope.validator(name))
         decorator = scope.validator(name)
         validators.append(decorator((func)))
 
 
+
+def _validate_net(token):
+    token = token[0]
+    if token.type=="STRING" or token.type=="IDENT":
+        try:
+            return str(token)
+        except:
+            pass 
