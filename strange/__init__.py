@@ -21,9 +21,11 @@
 import pkgutil
 import os
 import sys
+import itertools
 
 import weasyprint as wp
 import gdspy
+import numpy as np
 
 from . import weasyprint_patches as wp_patches
 
@@ -82,6 +84,104 @@ class LibTools(object):
             interface[pin] = (nets[ii], geometries[ii])
 
         return interface
+
+
+    @classmethod
+    def via_fill_simple(cls, polygon, dimension, spacing, layer):
+        """Generate standard via pattern inside ``polygon``.
+
+        ``polygon`` is a numpy.ndarray object of this form:
+                [[x1 y1]
+                 [x2 y2]
+                 ...    ]
+        
+        Vias are placed on up to the edges of ``polygon`` with
+        rectangular size ``dimension`` and distance ``spacing``
+        between inside edges.
+        """
+        step_size = dimension + spacing
+
+        # lay down a grid.
+        min_x, min_y = polygon.min(axis=0)
+        max_x, max_y = polygon.max(axis=0)
+
+        columns_x = np.arange(min_x, max_x - spacing, step_size)
+        rows_y = np.arange(min_y, max_y - spacing, step_size)
+
+        # only draw if grid points are inside ``polygon``
+        offset1 = np.array([0,          dimension])
+        offset2 = np.array([dimension,  0        ])
+        offset3 = np.array([dimension,  dimension])
+        geos = []
+        for point in itertools.product(columns_x, rows_y):
+            # This is a lot of checking... is there a better way?
+            if cls.point_inside_shape(point, polygon) and \
+               cls.point_inside_shape(point + offset1, polygon) and \
+               cls.point_inside_shape(point + offset2, polygon) and \
+               cls.point_inside_shape(point + offset3, polygon) :
+               geos.append(gdspy.Rectangle(
+                                    (point[0],           point[1]),
+                                    (point[0]+dimension, point[1]+dimension),
+                                    layer ))
+
+        return geos
+
+
+    @staticmethod
+    def point_inside_shape(p, verts, edges=None):
+        """Test whether the point p is inside the specified shape.
+        The shape is specified by 'verts' and 'edges'
+        Arguments:
+        p - the 2d point
+        verts - (N,2) array of points
+        edges - (N,2) array of vert indices indicating edges
+                If edges is None then assumed to be in order. I.e.
+                  [[0,1], [1,2], [2,3] ... [N-1,0]]
+
+        Returns:
+        - True/False based on result of in/out test.
+
+        Uses the 'ray to infinity' even-odd test.
+        Let the ray be the horizontal ray starting at p and going to +inf in x.
+        """
+
+        ################################################
+        # This method originally written by Bill Baxter,
+        # posted on scipy mailing list.
+        #
+        # I'm using this to avoid an extra dependency,
+        # but another (more optimized) option is to use
+        # matplotlib as follows:
+        #
+        # mplPath(shape).contains_points(test_point)
+        #
+        # TODO: benchmark this.
+        ################################################
+        
+        verts = np.asarray(verts)
+        if edges is None:
+            N = verts.shape[0]
+            edges = np.column_stack([np.c_[0:N],np.append(np.c_[1:N],0)])
+
+        inside = False
+        x,y=p[0],p[1]
+        for e in edges:
+            v0,v1 = verts[e[0]],verts[e[1]]
+            # Check if both verts to the left of ray
+            if v0[0]<x and v1[0]<x:
+                continue
+            # check if both on the same side of ray
+            if (v0[1]<y and v1[1]<y) or (v0[1]>y and v1[1]>y):
+                continue
+            #check for horizontal line - another horz line can't intersect it
+            if (v0[1]==v1[1]):
+                continue
+            # compute x intersection value
+            xisect = v0[0] + (v1[0]-v0[0])*((y-v0[1])/(v1[1]-v0[1]))
+            if xisect >= x:
+                inside = not inside
+        return inside
+
 
 
     ### CSS Validators

@@ -7,7 +7,7 @@ Process-specific features should be added on top of these devices.
 import gdspy
 import math
 
-from . import core_stackup
+from . import core_stackup as stackup
 from strange.containers import DeviceContainer
 from strange import LibTools
 
@@ -19,7 +19,7 @@ def _validate_layer(token):
         return token.value
     elif token.type=="STRING" or token.type=="IDENT":
         try:
-            return getattr(core_stackup, token.value.upper())
+            return getattr(stackup, token.value.upper())
         except:
             pass
 
@@ -28,6 +28,39 @@ def _compute_layer(computer, name, value):
     """Compute the ``layer`` property"""
     # TODO: What do I have to do here?
     return value
+
+
+
+
+class Vias(object):
+
+    min_properties = {
+    #   layer       :   (dimension, spacing, inset)
+        stackup.CO  :   (0.04,      0.03,    0.03),
+        stackup.V1  :   (0.04,      0.03,    0.03),
+        stackup.V2  :   (0.04,      0.03,    0.03),
+        stackup.V3  :   (0.04,      0.03,    0.03),
+        stackup.V4  :   (0.04,      0.03,    0.03),
+        stackup.V5  :   (0.04,      0.03,    0.03),
+        stackup.V6  :   (0.04,      0.03,    0.03),
+        stackup.V7  :   (0.04,      0.03,    0.03),
+        stackup.V8  :   (0.04,      0.03,    0.03),
+        stackup.V9  :   (0.04,      0.03,    0.03),
+        stackup.V10 :   (0.04,      0.03,    0.03),
+    }
+
+    @classmethod
+    def draw_vias(cls, polygon, layer):
+        """Fills ``polygon`` with vias according to appropriate rules.
+
+        Returns list of gdspy geometries on ``layer``
+        """ 
+        polygon = gdspy.offset(polygon, -cls.min_properties[layer][2])
+        return LibTools.via_fill_simple(
+                                polygon.polygons[0],
+                                cls.min_properties[layer][0],
+                                cls.min_properties[layer][1],
+                                layer)
 
 
 
@@ -136,19 +169,20 @@ class Devices(object):
             for this device and the netlist 
         """
 
+        # TODO: replace this with appropriate validator
         if l<=0:
             raise Exception("FATAL: Can't have negative legnth device.")
         if w<=0:
             raise Exception("FATAL: Can't have negative width device.")
 
         # Draw gate
-        gate = gdspy.Rectangle((0,ext_top), (l,-(w+ext_bottom)), core_stackup.PO);
+        gate = gdspy.Rectangle((0,ext_top), (l,-(w+ext_bottom)), stackup.PO);
 
         # Draw active area
         active = gdspy.Rectangle(
                         (-ext_left,0),
                         (l+ext_right,-w),
-                        core_stackup.RX
+                        stackup.RX
                     );
 
         # Draw contacts
@@ -165,17 +199,17 @@ class Devices(object):
             contacts_left = contacts_left + [
                     gdspy.Rectangle( (co_pos_xleft,thisY),
                                      (co_pos_xleft+co_size,thisY+co_size),
-                                      core_stackup.CO   )]
+                                      stackup.CO   )]
             contacts_right = contacts_right + [
                     gdspy.Rectangle( (co_pos_xright,thisY),
                                      (co_pos_xright+co_size,thisY+co_size),
-                                      core_stackup.CO )]
+                                      stackup.CO )]
 
         # Build Netlist
         interface = LibTools.generate_device_interface( \
-            ('g',  's',           'd',            'b'),
-            ( g ,   s ,            d ,             b ),
-            ( gate, contacts_left, contacts_right, []) \
+            ('g',    's',           'd',            'b'),
+            ( g ,     s ,            d ,             b ),
+            ( [gate], contacts_left, contacts_right, []) \
         )
 
         # Build Container
@@ -212,7 +246,7 @@ class Devices(object):
         """
 
         # Draw poly
-        poly = gdspy.Rectangle((-ext,0), (l+ext,-w), core_stackup.PO);
+        poly = gdspy.Rectangle((-ext,0), (l+ext,-w), stackup.PO);
 
         # Draw contacts
         num_co       = int( math.floor((w - co_space)/(co_space + co_size)) )
@@ -227,11 +261,11 @@ class Devices(object):
             contacts_left = contacts_left + [
                     gdspy.Rectangle( (co_pos_xleft,thisY),
                                      (co_pos_xleft+co_size,thisY+co_size),
-                                      core_stackup.CO )]
+                                      stackup.CO )]
             contacts_right = contacts_right + [
                     gdspy.Rectangle( (co_pos_xright,thisY),
                                      (co_pos_xright+co_size,thisY+co_size),
-                                      core_stackup.CO )]
+                                      stackup.CO )]
 
         # Build Netlist
         interface = LibTools.generate_device_interface( \

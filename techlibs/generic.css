@@ -48,10 +48,12 @@ ntap ntap {
 .m1 {
 	layer: 		M1;
 	margin: 	0.07um;
+	padding: 	0.07um;
 }
 
 .m2 {
 	layer: 		M2;
 	margin: 	0.07um;
+	padding: 	0.07um;
 }
 

@@ -38,7 +38,8 @@ class CellContainer(GenericContainer):
 
 	def __init__(self, geometries=[], netlist={}, tech=None):
 		super().__init__(geometries, netlist, tech)
-		self._devices = []
+		self._devices 	= []
+		self._by_layer 	= {}
 
 
 	def add(self, obj, net=''):
@@ -49,16 +50,26 @@ class CellContainer(GenericContainer):
 			for pin in interface.values():
 				net 		= pin[0]
 				geometries  = pin[1]
-				self._add_to_netlist(net, obj)
+				[self._add_to_netlist(net, geo) for geo in geometries]
 
 		else:
 			self._geometries.append(obj)
 			self._add_to_netlist(net, obj)
 
 
-	def _add_to_netlist(self, net, obj):
-		if net!='':
-			self._netlist[net] = obj
+	def _add_to_netlist(self, net, geo):
+		if net=='':
+			return
+
+		try:
+			self._netlist[net].append(geo)
+		except KeyError:
+			self._netlist[net] = [geo]
+
+		try:
+			self._by_layer[geo.layer].append(geo)
+		except KeyError:
+			self._by_layer[geo.layer] = [geo]
 
 
 	def draw(self, context):
@@ -68,6 +79,12 @@ class CellContainer(GenericContainer):
 			dev.draw(context)
 
 
+	def get_geometries_on_layer(self, layer):
+		"""Return a list of all geometries on ``layer``"""
+		try:
+			return self._by_layer[layer]
+		except KeyError:
+			return []
 
 
 
@@ -195,23 +212,7 @@ class DeviceContainer(GenericContainer):
 		"""
 
 	def draw(self, cell):
-		"""
-		Prints all geometries in this container to the gdspy cell given.
-
-		Parameters
-		----------
-		cell : Cell
-			A gdspy cell object
-
-		Modifies
-		--------
-		cell
-
-		Returns
-		-------
-		None.
-
-		"""
+		"""Prints all geometries in this container to the gdspy cell given."""
 
 		[cell.add(geo) for geo in self._geometries]
 

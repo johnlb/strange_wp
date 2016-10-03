@@ -81,11 +81,35 @@ PIN9 = 39
 PIN10= 40
 
 
-
+################################################################################
 # Layer Use Declarations - for routing
-metal_layers = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10']
-poly_layers  = ['PO']
-via_layers   = ['CO', 
-				'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'V9', 'V10']
-pin_layers 	 = ['PIN1', 'PIN2', 'PIN3', 'PIN4', 'PIN5',
-				'PIN6', 'PIN7', 'PIN8', 'PIN9', 'PIN10']
+#
+#   Layer functionality is declared by ordered tuples of layer numbers.
+#   They are related as follows:
+#
+# routing_layers:   (PO,     M1,       M2,  ...)
+#                       \   /   \     /
+# via_layers:       (    CO,     VIA1,      ...)
+#
+# pin_layers:       (O,     PIN1,     PIN2, ...)
+################################################################################
+routing_layers = (RX, PO, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10)
+# via_layers     = (CO, V1, V2, V3, V4, V5, V6, V7, V8, V9)
+via_layers     = {
+        (RX, M1) : CO,
+        (PO, M1) : CO,
+        (M1, M2) : V1,
+        (M2, M3) : V2,
+        (M3, M4) : V3,
+        (M4, M5) : V4,
+        (M5, M6) : V5,
+        (M6, M7) : V6,
+        (M7, M8) : V7,
+        (M8, M9) : V8,
+        (M9, M10): V9
+}
+pin_layers     = (PIN1, PIN2, PIN3, PIN4, PIN5, PIN6, PIN7, PIN8, PIN9, PIN10)
+poly_layers    = (PO)
+active_layers  = (RX)
+
+# assert(len(routing_layers)==len(via_layers)+1)

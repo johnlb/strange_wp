@@ -26,7 +26,6 @@ high-priority
     + CSS3 transform support would be nice, but not primary use case
 - add em (as relative to init value) to validators
 - figure out what sort of interfaces an autorouter would need
-    + How to encode connection points?
     + How to encode keepout zones?
     + How to encode preferred routing zones?
 
@@ -106,6 +105,7 @@ core_cmos.py
 ============
 - can we make parameters dict auto-populate?
 - maybe we should make it inherit from a base class?
+- move exception checks to validation functions
 
 validation.py
 =============

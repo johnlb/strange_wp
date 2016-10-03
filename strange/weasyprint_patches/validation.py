@@ -50,6 +50,6 @@ def _validate_net(token):
     token = token[0]
     if token.type=="STRING" or token.type=="IDENT":
         try:
-            return str(token)
+            return token.value
         except:
             pass 
